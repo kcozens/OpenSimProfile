@@ -95,8 +95,9 @@ namespace OpenSimProfile.Modules.OpenProfile
 		private void OnNewClient(IClientAPI client)
 		{
 			// Subscribe to messages
-			client.AddGenericPacketHandler("method", handler) 
-
+			client.AddGenericPacketHandler("avatarclassifiedsrequest", HandleAvatarClassifiedsRequest);
+			client.AddGenericPacketHandler("avatarpicksrequest", HandleAvatarPicksRequest);
+			client.AddGenericPacketHandler("avatarnotesrequest", HandleAvatarNotesRequest);
 		}
 
 		//
@@ -117,7 +118,7 @@ namespace OpenSimProfile.Modules.OpenProfile
 			catch (WebException ex)
 			{
 				m_log.ErrorFormat("[PROFILE]: Unable to connect to Profile " +
-						"Server {0}.  Exception {1}", m_SearchServer, ex);
+						"Server {0}.  Exception {1}", m_ProfileServer, ex);
 
 				Hashtable ErrorHash = new Hashtable();
 				ErrorHash["success"] = false;
@@ -130,7 +131,7 @@ namespace OpenSimProfile.Modules.OpenProfile
 			{
 				m_log.ErrorFormat(
 						"[SEARCH]: Unable to connect to Profile Server {0}. " +
-						"Exception {1}", m_SearchServer, ex);
+						"Exception {1}", m_ProfileServer, ex);
 
 				Hashtable ErrorHash = new Hashtable();
 				ErrorHash["success"] = false;
@@ -143,7 +144,7 @@ namespace OpenSimProfile.Modules.OpenProfile
 			{
 				m_log.ErrorFormat(
 						"[SEARCH]: Unable to connect to Profile Server {0}. " +
-						"Exception {1}", m_SearchServer, ex);
+						"Exception {1}", m_ProfileServer, ex);
 
 				Hashtable ErrorHash = new Hashtable();
 				ErrorHash["success"] = false;
@@ -165,13 +166,18 @@ namespace OpenSimProfile.Modules.OpenProfile
 			return RespData;
 		}
 
-		public delegate void GenericMessage(Object sender, string method, List<String> args); 
+		public void HandleAvatarClassifiedsRequest(Object sender, string method, List<String> args) 
 		{
+            if (!(sender is IClientAPI))
+                return;
+
+            IClientAPI remoteClient = (IClientAPI)sender;
+
 			Hashtable ReqHash = new Hashtable();
-			ReqHash["text"] = queryText;
+			ReqHash["uuid"] = args[0];
 			
 			Hashtable result = GenericXMLRPCRequest(ReqHash,
-					"dir_places_query");
+					method);
 
 			if (!Convert.ToBoolean(result["success"]))
 			{
@@ -179,33 +185,48 @@ namespace OpenSimProfile.Modules.OpenProfile
 						result["errorMessage"].ToString(), false);
 				return;
 			}
+		}
 
-			ArrayList dataArray = (ArrayList)result["data"];
+		public void HandleAvatarPicksRequest(Object sender, string method, List<String> args) 
+		{
+            if (!(sender is IClientAPI))
+                return;
 
-			int count = dataArray.Count;
-			if (count > 100)
-				count = 101;
+            IClientAPI remoteClient = (IClientAPI)sender;
 
-			DirPlacesReplyData[] data = new DirPlacesReplyData[count];
+			Hashtable ReqHash = new Hashtable();
+			ReqHash["uuid"] = args[0];
+			
+			Hashtable result = GenericXMLRPCRequest(ReqHash,
+					method);
 
-			int i = 0;
-
-			foreach (Object o in dataArray)
+			if (!Convert.ToBoolean(result["success"]))
 			{
-				Hashtable d = (Hashtable)o;
-
-				data[i] = new DirPlacesReplyData();
-				data[i].parcelID = new UUID(d["parcel_id"].ToString());
-				data[i].name = d["name"].ToString();
-				data[i].forSale = Convert.ToBoolean(d["for_sale"]);
-				data[i].auction = Convert.ToBoolean(d["auction"]);
-				data[i].dwell = Convert.ToSingle(d["dwell"]);
-				i++;
-				if (i >= count)
-					break;
+				remoteClient.SendAgentAlertMessage(
+						result["errorMessage"].ToString(), false);
+				return;
 			}
+		}
 
-			remoteClient.<packet>(data);
+		public void HandleAvatarNotesRequest(Object sender, string method, List<String> args) 
+		{
+            if (!(sender is IClientAPI))
+                return;
+
+            IClientAPI remoteClient = (IClientAPI)sender;
+
+			Hashtable ReqHash = new Hashtable();
+			ReqHash["uuid"] = args[0];
+			
+			Hashtable result = GenericXMLRPCRequest(ReqHash,
+					method);
+
+			if (!Convert.ToBoolean(result["success"]))
+			{
+				remoteClient.SendAgentAlertMessage(
+						result["errorMessage"].ToString(), false);
+				return;
+			}
 		}
 	}
 }
