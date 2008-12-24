@@ -185,6 +185,26 @@ namespace OpenSimProfile.Modules.OpenProfile
 						result["errorMessage"].ToString(), false);
 				return;
 			}
+
+			ArrayList dataArray = (ArrayList)result["data"];
+
+			AvatarClassifiedsReply[] data = new AvatarClassifiedsReply[count];
+
+			int i = 0;
+
+			foreach (Object o in dataArray)
+			{
+				Hashtable d = (Hashtable)o;
+
+				data[i] = new AvatarClassifiedsReply();
+				data[i].ClassifiedID = new UUID(d["classifiedid"].ToString());
+				data[i].Name = d["name"].ToString();
+				i++;
+				if (i >= count)
+					break;
+			}
+
+			remoteClient.SendAvatarClassifiedsReply(data);
 		}
 
 		public void HandleAvatarPicksRequest(Object sender, string method, List<String> args) 
@@ -206,6 +226,26 @@ namespace OpenSimProfile.Modules.OpenProfile
 						result["errorMessage"].ToString(), false);
 				return;
 			}
+
+			ArrayList dataArray = (ArrayList)result["data"];
+
+			AvatarPicksReply[] data = new AvatarPicksReply[count];
+
+			int i = 0;
+
+			foreach (Object o in dataArray)
+			{
+				Hashtable d = (Hashtable)o;
+
+				data[i] = new AvatarPicksReply();
+				data[i].pickID = new UUID(d["pickID"].ToString());
+				data[i].name = d["pickName"].ToString();
+				i++;
+				if (i >= count)
+					break;
+			}
+
+			remoteClient.SendAvatarPicksReply(data);
 		}
 
 		public void HandleAvatarNotesRequest(Object sender, string method, List<String> args) 
@@ -229,6 +269,26 @@ namespace OpenSimProfile.Modules.OpenProfile
 						result["errorMessage"].ToString(), false);
 				return;
 			}
+
+			ArrayList dataArray = (ArrayList)result["data"];
+
+			AvatarNotesReply[] data = new AvatarNotesReply[count];
+
+			int i = 0;
+
+			foreach (Object o in dataArray)
+			{
+				Hashtable d = (Hashtable)o;
+
+				data[i] = new AvatarNotesReply();
+				data[i].targetID = new UUID(d["targetID"].ToString());
+				data[i].notes = d["notes"].ToString();
+				i++;
+				if (i >= count)
+					break;
+			}
+
+			remoteClient.SendAvatarNotesReply(data);
 		}
 	}
 }
