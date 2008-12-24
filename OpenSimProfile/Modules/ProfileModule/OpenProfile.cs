@@ -216,6 +216,8 @@ namespace OpenSimProfile.Modules.OpenProfile
             IClientAPI remoteClient = (IClientAPI)sender;
 
 			Hashtable ReqHash = new Hashtable();
+
+			ReqHash["avatar_id"] = remoteClient.AgentId.ToString();
 			ReqHash["uuid"] = args[0];
 			
 			Hashtable result = GenericXMLRPCRequest(ReqHash,
