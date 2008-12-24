@@ -91,14 +91,16 @@ function avatarnotesrequest($method_name, $params, $app_data)
 	$req 			= $params[0];
 
 	$uuid 			= $req['uuid'];
+	$targetuuid		= $req['avatar_id'];
 
 	$result = mysql_query("select * from usernotes where ".
-			"TargetID = '". mysql_escape_string($uuid) ."'");
+			"userUUID = '". mysql_escape_string($uuid) ."' AND ".
+			"TargetID = '". mysql_escape_string($targetuuid) ."'");
 
 	while (($row = mysql_fetch_assoc($result)))
 	{
 		$data[] = array(
-				"targetID" => $row["TargetID",
+				"targetID" => $row["TargetID"],
 				"notes" => $row["Notes"]);
 	}
 
