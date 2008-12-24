@@ -130,7 +130,7 @@ namespace OpenSimProfile.Modules.OpenProfile
 			catch (SocketException ex)
 			{
 				m_log.ErrorFormat(
-						"[SEARCH]: Unable to connect to Profile Server {0}. " +
+						"[PROFILE]: Unable to connect to Profile Server {0}. " +
 						"Exception {1}", m_ProfileServer, ex);
 
 				Hashtable ErrorHash = new Hashtable();
@@ -143,7 +143,7 @@ namespace OpenSimProfile.Modules.OpenProfile
 			catch (XmlException ex)
 			{
 				m_log.ErrorFormat(
-						"[SEARCH]: Unable to connect to Profile Server {0}. " +
+						"[PROFILE]: Unable to connect to Profile Server {0}. " +
 						"Exception {1}", m_ProfileServer, ex);
 
 				Hashtable ErrorHash = new Hashtable();
