@@ -98,6 +98,9 @@ namespace OpenSimProfile.Modules.OpenProfile
 			client.AddGenericPacketHandler("avatarclassifiedsrequest", HandleAvatarClassifiedsRequest);
 			client.AddGenericPacketHandler("avatarpicksrequest", HandleAvatarPicksRequest);
 			client.AddGenericPacketHandler("avatarnotesrequest", HandleAvatarNotesRequest);
+			// Handle the Classifieds / Picks reading part
+			client.AddGenericPacketHandler("classifiedclickthrough", HandleClassifiedClickThrough);
+			client.AddGenericPacketHandler("pickinforequest", HandlePickInfoRequest);
 		}
 
 		//
@@ -188,22 +191,6 @@ namespace OpenSimProfile.Modules.OpenProfile
 
 			ArrayList dataArray = (ArrayList)result["data"];
 
-			AvatarClassifiedsReply[] data = new AvatarClassifiedsReply[count];
-
-			int i = 0;
-
-			foreach (Object o in dataArray)
-			{
-				Hashtable d = (Hashtable)o;
-
-				data[i] = new AvatarClassifiedsReply();
-				data[i].ClassifiedID = new UUID(d["classifiedid"].ToString());
-				data[i].Name = d["name"].ToString();
-				i++;
-				if (i >= count)
-					break;
-			}
-
 			remoteClient.SendAvatarClassifiedsReply(data);
 		}
 
@@ -229,23 +216,7 @@ namespace OpenSimProfile.Modules.OpenProfile
 
 			ArrayList dataArray = (ArrayList)result["data"];
 
-			AvatarPicksReply[] data = new AvatarPicksReply[count];
-
-			int i = 0;
-
-			foreach (Object o in dataArray)
-			{
-				Hashtable d = (Hashtable)o;
-
-				data[i] = new AvatarPicksReply();
-				data[i].pickID = new UUID(d["pickID"].ToString());
-				data[i].name = d["pickName"].ToString();
-				i++;
-				if (i >= count)
-					break;
-			}
-
-			remoteClient.SendAvatarPicksReply(data);
+			remoteClient.SendAvatarPicksReply();
 		}
 
 		public void HandleAvatarNotesRequest(Object sender, string method, List<String> args) 
@@ -272,23 +243,53 @@ namespace OpenSimProfile.Modules.OpenProfile
 
 			ArrayList dataArray = (ArrayList)result["data"];
 
-			AvatarNotesReply[] data = new AvatarNotesReply[count];
-
-			int i = 0;
-
-			foreach (Object o in dataArray)
-			{
-				Hashtable d = (Hashtable)o;
-
-				data[i] = new AvatarNotesReply();
-				data[i].targetID = new UUID(d["targetID"].ToString());
-				data[i].notes = d["notes"].ToString();
-				i++;
-				if (i >= count)
-					break;
-			}
-
 			remoteClient.SendAvatarNotesReply(data);
+		}
+
+		public void HandleClassifiedClickThrough(Object sender, string method, List<String> args) 
+		{
+            if (!(sender is IClientAPI))
+                return;
+
+            IClientAPI remoteClient = (IClientAPI)sender;
+
+			Hashtable ReqHash = new Hashtable();
+
+			ReqHash["avatar_id"] = args[0];
+			ReqHash["classified_id"] = args[1];
+			
+			Hashtable result = GenericXMLRPCRequest(ReqHash,
+					method);
+
+			if (!Convert.ToBoolean(result["success"]))
+			{
+				remoteClient.SendAgentAlertMessage(
+						result["errorMessage"].ToString(), false);
+				return;
+			}
+		}
+
+		public void HandlePickInfoRequest(Object sender, string method, List<String> args) 
+		{
+            if (!(sender is IClientAPI))
+                return;
+
+            IClientAPI remoteClient = (IClientAPI)sender;
+
+			Hashtable ReqHash = new Hashtable();
+
+			ReqHash["avatar_id"] = args[0];
+			ReqHash["pick_id"] = args[1];
+			
+			Hashtable result = GenericXMLRPCRequest(ReqHash,
+					method);
+
+			if (!Convert.ToBoolean(result["success"]))
+			{
+				remoteClient.SendAgentAlertMessage(
+						result["errorMessage"].ToString(), false);
+				return;
+			}
 		}
 	}
 }
