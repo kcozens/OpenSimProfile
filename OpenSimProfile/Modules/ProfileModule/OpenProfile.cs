@@ -191,7 +191,7 @@ namespace OpenSimProfile.Modules.OpenProfile
 
 			ArrayList dataArray = (ArrayList)result["data"];
 
-			remoteClient.SendAvatarClassifiedsReply(data);
+//			remoteClient.SendAvatarClassifiedsReply(data);
 		}
 
 		public void HandleAvatarPicksRequest(Object sender, string method, List<String> args) 
@@ -216,7 +216,7 @@ namespace OpenSimProfile.Modules.OpenProfile
 
 			ArrayList dataArray = (ArrayList)result["data"];
 
-			remoteClient.SendAvatarPicksReply();
+//			remoteClient.SendAvatarPicksReply();
 		}
 
 		public void HandleAvatarNotesRequest(Object sender, string method, List<String> args) 
@@ -243,7 +243,7 @@ namespace OpenSimProfile.Modules.OpenProfile
 
 			ArrayList dataArray = (ArrayList)result["data"];
 
-			remoteClient.SendAvatarNotesReply(data);
+//			remoteClient.SendAvatarNotesReply(data);
 		}
 
 		public void HandleClassifiedClickThrough(Object sender, string method, List<String> args) 
