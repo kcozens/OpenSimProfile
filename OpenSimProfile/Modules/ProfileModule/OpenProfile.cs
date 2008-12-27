@@ -191,7 +191,28 @@ namespace OpenSimProfile.Modules.OpenProfile
 
 			ArrayList dataArray = (ArrayList)result["data"];
 
-//			remoteClient.SendAvatarClassifiedsReply(data);
+			int count = dataArray.Count;
+
+			int i = 0;
+
+			foreach (Object o in dataArray)
+			{
+				Hashtable d = (Hashtable)o;
+				
+				Dictionary<UUID, string> classifieds = new Dictionary<UUID, string>();
+				
+				foreach(KeyValuePair<UUID, string> d in o)
+				{
+				classifieds.Add(new UUID(d["classifiedid"]).ToString()),d["name"].ToString());
+				i++;
+				if (i >= count)
+					break;
+				}
+			}
+
+			remoteClient.SendAvatarClassifiedsReply(
+						new UUID(d["useruuid"].ToString()), 
+						classifieds);
 		}
 
 		public void HandleAvatarPicksRequest(Object sender, string method, List<String> args) 
@@ -290,6 +311,25 @@ namespace OpenSimProfile.Modules.OpenProfile
 						result["errorMessage"].ToString(), false);
 				return;
 			}
+
+			Hashtable d = (Hashtable)dataArray[0];
+
+            Vector3 globalPos = new Vector3();
+			Vector3.TryParse(d["posglobal"].ToString(), out globalPos);
+
+			remoteClient.SendPickInfoReply(
+                    new UUID(d["pickuuid"].ToString()),
+                    new UUID(d["creatoruuid"].ToString()),
+					d["toppick"].ToString(),
+					new UUID(d["parceluuid"].ToString()),
+					d["name"].ToString(),
+					d["description"].ToString(),
+					new UUID(d["snapshotuuid"].ToString()),
+					d["user"].ToString(),
+					d["originalname"].ToString(),
+					globalPos,
+					d["sortorder"].ToString(),
+					d["enabled"].ToString());
 		}
 	}
 }
