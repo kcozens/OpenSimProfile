@@ -99,7 +99,6 @@ namespace OpenSimProfile.Modules.OpenProfile
 			client.AddGenericPacketHandler("avatarpicksrequest", HandleAvatarPicksRequest);
 			client.AddGenericPacketHandler("avatarnotesrequest", HandleAvatarNotesRequest);
 			// Handle the Classifieds / Picks reading part
-			client.AddGenericPacketHandler("classifiedclickthrough", HandleClassifiedClickThrough);
 			client.AddGenericPacketHandler("pickinforequest", HandlePickInfoRequest);
 		}
 
@@ -267,30 +266,11 @@ namespace OpenSimProfile.Modules.OpenProfile
 
 			ArrayList dataArray = (ArrayList)result["data"];
 
-//			remoteClient.SendAvatarNotesReply(data);
-		}
+			Hashtable d = (Hashtable)dataArray[0];
 
-		public void HandleClassifiedClickThrough(Object sender, string method, List<String> args) 
-		{
-            if (!(sender is IClientAPI))
-                return;
-
-            IClientAPI remoteClient = (IClientAPI)sender;
-
-			Hashtable ReqHash = new Hashtable();
-
-			ReqHash["avatar_id"] = args[0];
-			ReqHash["classified_id"] = args[1];
-			
-			Hashtable result = GenericXMLRPCRequest(ReqHash,
-					method);
-
-			if (!Convert.ToBoolean(result["success"]))
-			{
-				remoteClient.SendAgentAlertMessage(
-						result["errorMessage"].ToString(), false);
-				return;
-			}
+			remoteClient.SendAvatarNotesReply(
+							new UUID(d["targetid"].ToString()),
+							d["notes"].ToString());
 		}
 
 		public void HandlePickInfoRequest(Object sender, string method, List<String> args) 

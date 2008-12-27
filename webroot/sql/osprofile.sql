@@ -3,7 +3,7 @@
 -- http://www.phpmyadmin.net
 -- 
 -- Host: localhost
--- Generatie Tijd: 24 Dec 2008 om 22:40
+-- Generatie Tijd: 27 Dec 2008 om 22:25
 -- Server versie: 5.0.67
 -- PHP Versie: 5.2.6-2ubuntu5
 -- 
@@ -13,35 +13,14 @@
 -- --------------------------------------------------------
 
 -- 
--- Tabel structuur voor tabel `userclassifieds`
--- 
-
-CREATE TABLE `userclassifieds` (
-  `userUUID` varchar(36) NOT NULL,
-  `ClassifiedID` varchar(36) NOT NULL,
-  `Category` int(2) NOT NULL,
-  `Name` varchar(255) NOT NULL,
-  `Desc` text NOT NULL,
-  `ParcelID` varchar(36) NOT NULL,
-  `ParentEstate` int(2) NOT NULL,
-  `SnapshotID` varchar(36) NOT NULL,
-  `PosGlobal` varchar(255) NOT NULL,
-  `ClassifiedFlags` int(2) NOT NULL,
-  `PriceForListing` int(6) NOT NULL,
-  PRIMARY KEY  (`userUUID`)
-) ENGINE=MyISAM DEFAULT CHARSET=latin1;
-
--- --------------------------------------------------------
-
--- 
 -- Tabel structuur voor tabel `usernotes`
 -- 
 
 CREATE TABLE `usernotes` (
-  `userUUID` varchar(36) NOT NULL,
-  `TargetID` varchar(36) NOT NULL,
-  `Notes` text NOT NULL,
-  PRIMARY KEY  (`userUUID`)
+  `useruuid` varchar(36) NOT NULL,
+  `targetuuid` varchar(36) NOT NULL,
+  `notes` text NOT NULL,
+  PRIMARY KEY  (`useruuid`)
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1;
 
 -- --------------------------------------------------------
@@ -51,17 +30,19 @@ CREATE TABLE `usernotes` (
 -- 
 
 CREATE TABLE `userpicks` (
-  `userUUID` varchar(36) NOT NULL,
-  `PickID` varchar(36) NOT NULL,
-  `CreatorID` varchar(36) NOT NULL,
-  `TopPick` enum('0','1') NOT NULL,
-  `ParcelID` varchar(36) NOT NULL,
-  `Name` varchar(255) NOT NULL,
-  `SnapshotID` varchar(36) NOT NULL,
-  `PosGlobal` varchar(255) NOT NULL,
-  `SortOrder` int(2) NOT NULL,
-  `Enabled` binary(1) NOT NULL,
-  PRIMARY KEY  (`userUUID`)
+  `pickuuid` varchar(36) NOT NULL,
+  `creatoruuid` varchar(36) NOT NULL,
+  `toppick` enum('true','false') NOT NULL,
+  `parceluuid` varchar(36) NOT NULL,
+  `name` varchar(255) NOT NULL,
+  `desc` text NOT NULL,
+  `snapshotuuid` varchar(36) NOT NULL,
+  `user` varchar(255) NOT NULL,
+  `originalname` varchar(255) NOT NULL,
+  `posglobal` varchar(255) NOT NULL,
+  `sortorder` int(2) NOT NULL,
+  `enabled` enum('true','false') NOT NULL,
+  PRIMARY KEY  (`pickuuid`)
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1;
 
 -- --------------------------------------------------------
@@ -71,7 +52,7 @@ CREATE TABLE `userpicks` (
 -- 
 
 CREATE TABLE `userprofile` (
-  `userUUID` varchar(36) NOT NULL,
+  `useruuid` varchar(36) NOT NULL,
   `profilePartner` varchar(36) NOT NULL,
   `profileImage` varchar(36) NOT NULL,
   `profileAboutText` text NOT NULL,
@@ -85,5 +66,5 @@ CREATE TABLE `userprofile` (
   `profileLanguages` text NOT NULL,
   `profileFirstImage` varchar(36) NOT NULL,
   `profileFirstText` text NOT NULL,
-  PRIMARY KEY  (`userUUID`)
+  PRIMARY KEY  (`useruuid`)
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1;
