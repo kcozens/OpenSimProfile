@@ -71,7 +71,7 @@ function avatarpicksrequest($method_name, $params, $app_data)
 	{
 		$data[] = array(
 				"pickID" => $row["PickID"],
-				"pickName" => $row["Name"]);
+				"name" => $row["Name"]);
 	}
 
 	$response_xml = xmlrpc_encode(array(
@@ -102,6 +102,76 @@ function avatarnotesrequest($method_name, $params, $app_data)
 		$data[] = array(
 				"targetID" => $row["TargetID"],
 				"notes" => $row["Notes"]);
+	}
+
+	$response_xml = xmlrpc_encode(array(
+		'success'	  => True,
+		'errorMessage' => "",
+		'data' => $data
+	));
+
+	print $response_xml;
+}
+
+xmlrpc_server_register_method($xmlrpc_server, "classifiedclickthrough",
+		"classifiedclickthrough");
+
+function classifiedclickthrough($method_name, $params, $app_data)
+{
+	$req 			= $params[0];
+
+	$uuid 			= $req['uuid'];
+	$targetuuid		= $req['avatar_id'];
+
+	$result = mysql_query("select * from usernotes where ".
+			"userUUID = '". mysql_escape_string($uuid) ."' AND ".
+			"TargetID = '". mysql_escape_string($targetuuid) ."'");
+
+	while (($row = mysql_fetch_assoc($result)))
+	{
+		$data[] = array(
+				"targetID" => $row["TargetID"],
+				"notes" => $row["Notes"]);
+	}
+
+	$response_xml = xmlrpc_encode(array(
+		'success'	  => True,
+		'errorMessage' => "",
+		'data' => $data
+	));
+
+	print $response_xml;
+}
+
+xmlrpc_server_register_method($xmlrpc_server, "pickinforequest",
+		"pickinforequest");
+
+function pickinforequest($method_name, $params, $app_data)
+{
+	$req 			= $params[0];
+
+	$uuid 			= $req['avatar_id'];
+	$pick			= $req['pick_id'];
+
+	$result = mysql_query("select * from userpicks where ".
+			"CreatorID = '". mysql_escape_string($uuid) ."' AND ".
+			"PickID = '". mysql_escape_string($pick) ."'");
+
+	while (($row = mysql_fetch_assoc($result)))
+	{
+		$data[] = array(
+				"pickuuid" => $row["PickID"],
+				"creatoruuid" => $row["CreatorID"],
+				"toppick" => $row["TopPick"],
+				"parceluuid" => $row["ParcelID"],
+				"name" => $row["Name"],
+				"description" => $row["Desc"],
+				"snapshotuuid" => $row["SnapshotID"],
+				"user" => $row["User"],
+				"originalname" => $row["OriginalName"],
+				"posglobal" => $row["PosGlobal"],
+				"sortorder"=> $row["SortOrder"],
+				"enabled" => $row["Enabled"]);
 	}
 
 	$response_xml = xmlrpc_encode(array(
