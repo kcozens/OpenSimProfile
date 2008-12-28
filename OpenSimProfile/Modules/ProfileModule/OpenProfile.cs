@@ -190,10 +190,6 @@ namespace OpenSimProfile.Modules.OpenProfile
 
 			ArrayList dataArray = (ArrayList)result["data"];
 
-			int count = dataArray.Count;
-
-			int i = 0;
-
             Dictionary<UUID, string> classifieds = new Dictionary<UUID, string>();
 
 			foreach (Object o in dataArray)
