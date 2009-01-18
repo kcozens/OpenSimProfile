@@ -276,7 +276,7 @@ namespace OpenSimProfile.Modules.OpenProfile
             else
             {
                 remoteClient.SendAvatarNotesReply(
-                                remoteClient.AgentId,
+                                new UUID(args[0]),
                                 "");
             }
 		}
