@@ -265,11 +265,20 @@ namespace OpenSimProfile.Modules.OpenProfile
 
 			ArrayList dataArray = (ArrayList)result["data"];
 
-			Hashtable d = (Hashtable)dataArray[0];
+            if (dataArray != null && dataArray[0] != null)
+            {
+                Hashtable d = (Hashtable)dataArray[0];
 
-			remoteClient.SendAvatarNotesReply(
-							new UUID(d["targetid"].ToString()),
-							d["notes"].ToString());
+                remoteClient.SendAvatarNotesReply(
+                                new UUID(d["targetid"].ToString()),
+                                d["notes"].ToString());
+            }
+            else
+            {
+                remoteClient.SendAvatarNotesReply(
+                                remoteClient.AgentId,
+                                "");
+            }
 		}
 
 		public void HandlePickInfoRequest(Object sender, string method, List<String> args) 
