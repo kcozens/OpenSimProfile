@@ -227,12 +227,15 @@ namespace OpenSimProfile.Modules.OpenProfile
 
             Dictionary<UUID, string> picks = new Dictionary<UUID, string>();
 
-			foreach (Object o in dataArray)
-			{
-				Hashtable d = (Hashtable)o;
-				
-                picks[new UUID(d["pickid"].ToString())] = d["name"].ToString();
-			}
+            if (dataArray != null)
+            {
+                foreach (Object o in dataArray)
+                {
+                        Hashtable d = (Hashtable)o;
+                    
+                    picks[new UUID(d["pickid"].ToString())] = d["name"].ToString();
+                }
+            }
 
 			remoteClient.SendAvatarPicksReply(remoteClient.AgentId, 
 						picks);		
