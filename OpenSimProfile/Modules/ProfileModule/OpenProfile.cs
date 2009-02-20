@@ -99,6 +99,14 @@ namespace OpenSimProfile.Modules.OpenProfile
 			client.AddGenericPacketHandler("avatarnotesrequest", HandleAvatarNotesRequest);
 			// Handle the Classifieds / Picks reading part
 			client.AddGenericPacketHandler("pickinforequest", HandlePickInfoRequest);
+			// Handle the Classifieds Update and Delete
+			client.OnClassifiedInfoUpdate += ClassifiedInfoUpdate;
+			client.OnClassifiedDelete += ClassifiedDelete;
+			//Handle the Notes Update
+			// client.OnAvatarNotesUpdate += AvatarNotesUpdate;
+			// Handle the Picks Update and Delete
+			// client.OnPickInfoUpdate += PickInfoUpdate;
+			// client.OnPickDelete += PickDelete;
 		}
 
 		//
@@ -322,6 +330,27 @@ namespace OpenSimProfile.Modules.OpenProfile
 //					globalPos,
 //					d["sortorder"].ToString(),
 //					d["enabled"].ToString());
+		}
+
+		public void ClassifiedInfoUpdate ()
+		{
+
+		}
+
+		public void ClassifiedDelete (UUID queryClassifiedID, IClientAPI remoteClient)
+		{
+			Hashtable ReqHash = new Hashtable();
+			ReqHash["classifiedID"] = queryClassifiedID.ToString();
+
+			Hashtable result = GenericXMLRPCRequest(ReqHash,
+					"classified_delete");
+
+			if (!Convert.ToBoolean(result["success"]))
+			{
+				remoteClient.SendAgentAlertMessage(
+						result["errorMessage"].ToString(), false);
+				return;
+			}
 		}
 	}
 }
