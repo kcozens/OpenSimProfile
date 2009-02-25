@@ -94,19 +94,21 @@ namespace OpenSimProfile.Modules.OpenProfile
 		private void OnNewClient(IClientAPI client)
 		{
 			// Subscribe to messages
+
+			// Classifieds
 			client.AddGenericPacketHandler("avatarclassifiedsrequest", HandleAvatarClassifiedsRequest);
+			// client.OnClassifiedInfoUpdate += ClassifiedInfoUpdate;
+			// client.OnClassifiedDelete += ClassifiedDelete;
+
+			// Picks
 			client.AddGenericPacketHandler("avatarpicksrequest", HandleAvatarPicksRequest);
-			client.AddGenericPacketHandler("avatarnotesrequest", HandleAvatarNotesRequest);
-			// Handle the Classifieds / Picks reading part
 			client.AddGenericPacketHandler("pickinforequest", HandlePickInfoRequest);
-			// Handle the Classifieds Update and Delete
-			client.OnClassifiedInfoUpdate += ClassifiedInfoUpdate;
-			client.OnClassifiedDelete += ClassifiedDelete;
-			//Handle the Notes Update
-			// client.OnAvatarNotesUpdate += AvatarNotesUpdate;
-			// Handle the Picks Update and Delete
 			// client.OnPickInfoUpdate += PickInfoUpdate;
 			// client.OnPickDelete += PickDelete;
+
+			// Notes
+			client.AddGenericPacketHandler("avatarnotesrequest", HandleAvatarNotesRequest);
+			// client.OnAvatarNotesUpdate += AvatarNotesUpdate;
 		}
 
 		//
@@ -175,6 +177,8 @@ namespace OpenSimProfile.Modules.OpenProfile
 			return RespData;
 		}
 
+		// Classifieds Handler
+
 		public void HandleAvatarClassifiedsRequest(Object sender, string method, List<String> args) 
 		{
             if (!(sender is IClientAPI))
@@ -209,6 +213,43 @@ namespace OpenSimProfile.Modules.OpenProfile
 			remoteClient.SendAvatarClassifiedReply(remoteClient.AgentId, 
 						classifieds);
 		}
+
+		// Classifieds Update
+
+//		public void ClassifiedInfoUpdate ()
+//		{
+//			Hashtable ReqHash = new Hashtable();
+//
+//			Hashtable result = GenericXMLRPCRequest(ReqHash,
+//					"classified_update");
+//
+//			if (!Convert.ToBoolean(result["success"]))
+//			{
+//				remoteClient.SendAgentAlertMessage(
+//						result["errorMessage"].ToString(), false);
+//				return;
+//			}
+//		}
+
+		// Classifieds Delete
+
+//		public void ClassifiedDelete (UUID queryClassifiedID, IClientAPI remoteClient)
+//		{
+//			Hashtable ReqHash = new Hashtable();
+//			ReqHash["classifiedID"] = queryClassifiedID.ToString();
+//
+//			Hashtable result = GenericXMLRPCRequest(ReqHash,
+//					"classified_delete");
+//
+//			if (!Convert.ToBoolean(result["success"]))
+//			{
+//				remoteClient.SendAgentAlertMessage(
+//						result["errorMessage"].ToString(), false);
+//				return;
+//			}
+//		}
+
+		// Picks Handler
 
 		public void HandleAvatarPicksRequest(Object sender, string method, List<String> args) 
 		{
@@ -248,45 +289,7 @@ namespace OpenSimProfile.Modules.OpenProfile
 						picks);		
 		}
 
-		public void HandleAvatarNotesRequest(Object sender, string method, List<String> args) 
-		{
-            if (!(sender is IClientAPI))
-                return;
-
-            IClientAPI remoteClient = (IClientAPI)sender;
-
-			Hashtable ReqHash = new Hashtable();
-
-			ReqHash["avatar_id"] = remoteClient.AgentId.ToString();
-			ReqHash["uuid"] = args[0];
-			
-			Hashtable result = GenericXMLRPCRequest(ReqHash,
-					method);
-
-			if (!Convert.ToBoolean(result["success"]))
-			{
-				remoteClient.SendAgentAlertMessage(
-						result["errorMessage"].ToString(), false);
-				return;
-			}
-
-			ArrayList dataArray = (ArrayList)result["data"];
-
-            if (dataArray != null && dataArray[0] != null)
-            {
-                Hashtable d = (Hashtable)dataArray[0];
-
-                remoteClient.SendAvatarNotesReply(
-                                new UUID(d["targetid"].ToString()),
-                                d["notes"].ToString());
-            }
-            else
-            {
-                remoteClient.SendAvatarNotesReply(
-                                new UUID(args[0]),
-                                "");
-            }
-		}
+		// Picks Request
 
 		public void HandlePickInfoRequest(Object sender, string method, List<String> args) 
 		{
@@ -332,18 +335,56 @@ namespace OpenSimProfile.Modules.OpenProfile
 //					d["enabled"].ToString());
 		}
 
-		public void ClassifiedInfoUpdate ()
-		{
+		// Picks Update
 
-		}
+//		public void PickInfoUpdate()
+//		{
+//			Hashtable ReqHash = new Hashtable();
+//			
+//			Hashtable result = GenericXMLRPCRequest(ReqHash,
+//					"picks_update");
+//
+//			if (!Convert.ToBoolean(result["success"]))
+//			{
+//				remoteClient.SendAgentAlertMessage(
+//						result["errorMessage"].ToString(), false);
+//				return;
+//			}
+//		}
 
-		public void ClassifiedDelete (UUID queryClassifiedID, IClientAPI remoteClient)
+		// Picks Delete
+
+//		public void PickDelete()
+//		{
+//			Hashtable ReqHash = new Hashtable();
+//			
+//			Hashtable result = GenericXMLRPCRequest(ReqHash,
+//					"picks_delete");
+//
+//			if (!Convert.ToBoolean(result["success"]))
+//			{
+//				remoteClient.SendAgentAlertMessage(
+//						result["errorMessage"].ToString(), false);
+//				return;
+//			}
+//		}
+
+		// Notes Handler
+
+		public void HandleAvatarNotesRequest(Object sender, string method, List<String> args) 
 		{
+            if (!(sender is IClientAPI))
+                return;
+
+            IClientAPI remoteClient = (IClientAPI)sender;
+
 			Hashtable ReqHash = new Hashtable();
-			ReqHash["classifiedID"] = queryClassifiedID.ToString();
 
+			ReqHash["avatar_id"] = remoteClient.AgentId.ToString();
+			ReqHash["uuid"] = args[0];
+			
 			Hashtable result = GenericXMLRPCRequest(ReqHash,
-					"classified_delete");
+					method);
 
 			if (!Convert.ToBoolean(result["success"]))
 			{
@@ -351,6 +392,44 @@ namespace OpenSimProfile.Modules.OpenProfile
 						result["errorMessage"].ToString(), false);
 				return;
 			}
+
+			ArrayList dataArray = (ArrayList)result["data"];
+
+            if (dataArray != null && dataArray[0] != null)
+            {
+                Hashtable d = (Hashtable)dataArray[0];
+
+                remoteClient.SendAvatarNotesReply(
+                                new UUID(d["targetid"].ToString()),
+                                d["notes"].ToString());
+            }
+            else
+            {
+                remoteClient.SendAvatarNotesReply(
+                                new UUID(args[0]),
+                                "");
+            }
 		}
+
+		// Notes Update
+
+//		public void AvatarNotesUpdate(UUID queryTargetID, string queryNotes, IClientAPI remoteClient)
+//		{
+//			Hashtable ReqHash = new Hashtable();
+//			
+//			ReqHash["avatar_id"] = remoteClient.AgentId.ToString();
+//			ReqHash["targetID"] = queryTargetID;
+//			ReqHash["notes"] = queryNotes;
+//
+//			Hashtable result = GenericXMLRPCRequest(ReqHash,
+//					"avatar_notes_update");
+//
+//			if (!Convert.ToBoolean(result["success"]))
+//			{
+//				remoteClient.SendAgentAlertMessage(
+//						result["errorMessage"].ToString(), false);
+//				return;
+//			}
+//		}
 	}
 }
