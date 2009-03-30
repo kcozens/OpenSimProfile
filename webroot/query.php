@@ -139,6 +139,7 @@ function pickinforequest($method_name, $params, $app_data)
 				"snapshotuuid" => $row["snapshotuuid"],
 				"user" => $row["user"],
 				"originalname" => $row["originalname"],
+				"simname" => $row["simname"],
 				"posglobal" => $row["posglobal"],
 				"sortorder"=> $row["sortorder"],
 				"enabled" => $row["enabled"]);
@@ -160,11 +161,9 @@ function classified_delete($method_name, $params, $app_data)
 {
 	$req 			= $params[0];
 
-	$owneruuid 			= $req['owneruuid'];
-	$classifieduuid		= $req['classifieduuid'];
+	$classifieduuid		= $req['classifiedID'];
 
 	$result = mysql_query("delete from ossearch.classifieds where ".
-			"creatoruuid = '". mysql_escape_string($owneruuid) ."' AND ".
 			"classifieduuid = '".mysql_escape_string($classifieduuid) ."'");
 	
 	$response_xml = xmlrpc_encode(array(

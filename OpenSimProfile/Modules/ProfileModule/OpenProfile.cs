@@ -97,18 +97,18 @@ namespace OpenSimProfile.Modules.OpenProfile
 
 			// Classifieds
 			client.AddGenericPacketHandler("avatarclassifiedsrequest", HandleAvatarClassifiedsRequest);
-			// client.OnClassifiedInfoUpdate += ClassifiedInfoUpdate;
-			// client.OnClassifiedDelete += ClassifiedDelete;
+			client.OnClassifiedInfoUpdate += ClassifiedInfoUpdate;
+			client.OnClassifiedDelete += ClassifiedDelete;
 
 			// Picks
 			client.AddGenericPacketHandler("avatarpicksrequest", HandleAvatarPicksRequest);
 			client.AddGenericPacketHandler("pickinforequest", HandlePickInfoRequest);
-			// client.OnPickInfoUpdate += PickInfoUpdate;
-			// client.OnPickDelete += PickDelete;
+			client.OnPickInfoUpdate += PickInfoUpdate;
+			client.OnPickDelete += PickDelete;
 
 			// Notes
 			client.AddGenericPacketHandler("avatarnotesrequest", HandleAvatarNotesRequest);
-			// client.OnAvatarNotesUpdate += AvatarNotesUpdate;
+			client.OnAvatarNotesUpdate += AvatarNotesUpdate;
 		}
 
 		//
@@ -216,38 +216,52 @@ namespace OpenSimProfile.Modules.OpenProfile
 
 		// Classifieds Update
 
-//		public void ClassifiedInfoUpdate ()
-//		{
-//			Hashtable ReqHash = new Hashtable();
-//
-//			Hashtable result = GenericXMLRPCRequest(ReqHash,
-//					"classified_update");
-//
-//			if (!Convert.ToBoolean(result["success"]))
-//			{
-//				remoteClient.SendAgentAlertMessage(
-//						result["errorMessage"].ToString(), false);
-//				return;
-//			}
-//		}
+		public void ClassifiedInfoUpdate(UUID queryclassifiedID, uint queryCategory, string queryName, string queryDescription, UUID queryParcelID, 
+										uint queryParentEstate, UUID querySnapshotID, Vector3 queryGlobalPos, byte queryclassifiedFlags, 
+										int queryclassifiedPrice, IClientAPI remoteClient)
+		{
+			Hashtable ReqHash = new Hashtable();
+
+			ReqHash["classifiedUUID"] = queryclassifiedID.ToString();
+			ReqHash["category"] = queryCategory;
+			ReqHash["name"] = queryName;
+			ReqHash["description"] = queryDescription;
+			ReqHash["parcelUUID"] = queryParcelID.ToString();
+			ReqHash["parentestate"] = queryParentEstate;
+			ReqHash["snapshotUUID"] = querySnapshotID.ToString();
+			ReqHash["globalpos"] = queryGlobalPos;
+			ReqHash["classifiedFlags"] = queryclassifiedFlags;
+			ReqHash["classifiedPrice"] = queryclassifiedPrice;
+
+			Hashtable result = GenericXMLRPCRequest(ReqHash,
+					"classified_update");
+
+			if (!Convert.ToBoolean(result["success"]))
+			{
+				remoteClient.SendAgentAlertMessage(
+						result["errorMessage"].ToString(), false);
+				return;
+			}
+		}
 
 		// Classifieds Delete
 
-//		public void ClassifiedDelete (UUID queryClassifiedID, IClientAPI remoteClient)
-//		{
-//			Hashtable ReqHash = new Hashtable();
-//			ReqHash["classifiedID"] = queryClassifiedID.ToString();
-//
-//			Hashtable result = GenericXMLRPCRequest(ReqHash,
-//					"classified_delete");
-//
-//			if (!Convert.ToBoolean(result["success"]))
-//			{
-//				remoteClient.SendAgentAlertMessage(
-//						result["errorMessage"].ToString(), false);
-//				return;
-//			}
-//		}
+		public void ClassifiedDelete (UUID queryClassifiedID, IClientAPI remoteClient)
+		{
+			Hashtable ReqHash = new Hashtable();
+
+			ReqHash["classifiedID"] = queryClassifiedID.ToString();
+
+			Hashtable result = GenericXMLRPCRequest(ReqHash,
+					"classified_delete");
+
+			if (!Convert.ToBoolean(result["success"]))
+			{
+				remoteClient.SendAgentAlertMessage(
+						result["errorMessage"].ToString(), false);
+				return;
+			}
+		}
 
 		// Picks Handler
 
@@ -320,54 +334,57 @@ namespace OpenSimProfile.Modules.OpenProfile
             Vector3 globalPos = new Vector3();
 			Vector3.TryParse(d["posglobal"].ToString(), out globalPos);
 
-//			remoteClient.SendPickInfoReply(
-//                    new UUID(d["pickuuid"].ToString()),
-//                    new UUID(d["creatoruuid"].ToString()),
-//					d["toppick"].ToString(),
-//					new UUID(d["parceluuid"].ToString()),
-//					d["name"].ToString(),
-//					d["description"].ToString(),
-//					new UUID(d["snapshotuuid"].ToString()),
-//					d["user"].ToString(),
-//					d["originalname"].ToString(),
-//					globalPos,
-//					d["sortorder"].ToString(),
-//					d["enabled"].ToString());
+			remoteClient.SendPickInfoReply(
+                    new UUID(d["pickuuid"].ToString()),
+                    new UUID(d["creatoruuid"].ToString()),
+					Convert.ToBoolean(d["toppick"]),
+					new UUID(d["parceluuid"].ToString()),
+					d["name"].ToString(),
+					d["description"].ToString(),
+					new UUID(d["snapshotuuid"].ToString()),
+					d["user"].ToString(),
+					d["originalname"].ToString(),
+					d["simname"].ToString(),
+					globalPos,
+					Convert.ToInt32(d["sortorder"]),
+					Convert.ToBoolean(d["enabled"]));
 		}
 
 		// Picks Update
 
-//		public void PickInfoUpdate()
-//		{
-//			Hashtable ReqHash = new Hashtable();
-//			
-//			Hashtable result = GenericXMLRPCRequest(ReqHash,
-//					"picks_update");
-//
-//			if (!Convert.ToBoolean(result["success"]))
-//			{
-//				remoteClient.SendAgentAlertMessage(
-//						result["errorMessage"].ToString(), false);
-//				return;
-//			}
-//		}
+		public void PickInfoUpdate(IClientAPI remoteClient, UUID pickID, UUID creatorID, bool topPick, string name, string desc, UUID snapshotID, int sortOrder, bool enabled)
+		{
+			Hashtable ReqHash = new Hashtable();
+			
+			Hashtable result = GenericXMLRPCRequest(ReqHash,
+					"picks_update");
+
+			if (!Convert.ToBoolean(result["success"]))
+			{
+				remoteClient.SendAgentAlertMessage(
+						result["errorMessage"].ToString(), false);
+				return;
+			}
+		}
 
 		// Picks Delete
 
-//		public void PickDelete()
-//		{
-//			Hashtable ReqHash = new Hashtable();
-//			
-//			Hashtable result = GenericXMLRPCRequest(ReqHash,
-//					"picks_delete");
-//
-//			if (!Convert.ToBoolean(result["success"]))
-//			{
-//				remoteClient.SendAgentAlertMessage(
-//						result["errorMessage"].ToString(), false);
-//				return;
-//			}
-//		}
+		public void PickDelete(IClientAPI remoteClient, UUID queryPickID)
+		{
+			Hashtable ReqHash = new Hashtable();
+			
+			ReqHash["pick_id"] = queryPickID;
+
+			Hashtable result = GenericXMLRPCRequest(ReqHash,
+					"picks_delete");
+
+			if (!Convert.ToBoolean(result["success"]))
+			{
+				remoteClient.SendAgentAlertMessage(
+						result["errorMessage"].ToString(), false);
+				return;
+			}
+		}
 
 		// Notes Handler
 
@@ -406,30 +423,30 @@ namespace OpenSimProfile.Modules.OpenProfile
             else
             {
                 remoteClient.SendAvatarNotesReply(
-                                new UUID(args[0]),
+                                new UUID(ReqHash["uuid"].ToString()),
                                 "");
             }
 		}
 
 		// Notes Update
 
-//		public void AvatarNotesUpdate(UUID queryTargetID, string queryNotes, IClientAPI remoteClient)
-//		{
-//			Hashtable ReqHash = new Hashtable();
-//			
-//			ReqHash["avatar_id"] = remoteClient.AgentId.ToString();
-//			ReqHash["targetID"] = queryTargetID;
-//			ReqHash["notes"] = queryNotes;
-//
-//			Hashtable result = GenericXMLRPCRequest(ReqHash,
-//					"avatar_notes_update");
-//
-//			if (!Convert.ToBoolean(result["success"]))
-//			{
-//				remoteClient.SendAgentAlertMessage(
-//						result["errorMessage"].ToString(), false);
-//				return;
-//			}
-//		}
+		public void AvatarNotesUpdate(IClientAPI remoteClient, UUID queryTargetID, string queryNotes)
+		{
+			Hashtable ReqHash = new Hashtable();
+			
+			ReqHash["avatar_id"] = remoteClient.AgentId.ToString();
+			ReqHash["target_id"] = queryTargetID;
+			ReqHash["notes"] = queryNotes;
+
+			Hashtable result = GenericXMLRPCRequest(ReqHash,
+					"avatar_notes_update");
+
+			if (!Convert.ToBoolean(result["success"]))
+			{
+				remoteClient.SendAgentAlertMessage(
+						result["errorMessage"].ToString(), false);
+				return;
+			}
+		}
 	}
 }

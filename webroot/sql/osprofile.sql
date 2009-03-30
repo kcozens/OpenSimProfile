@@ -3,9 +3,9 @@
 -- http://www.phpmyadmin.net
 -- 
 -- Host: localhost
--- Generatie Tijd: 27 Dec 2008 om 22:25
--- Server versie: 5.0.67
--- PHP Versie: 5.2.6-2ubuntu5
+-- Generatie Tijd: 30 Mar 2009 om 22:05
+-- Server versie: 5.0.75
+-- PHP Versie: 5.2.6-3ubuntu2
 -- 
 -- Database: `osprofile`
 -- 
@@ -39,6 +39,7 @@ CREATE TABLE `userpicks` (
   `snapshotuuid` varchar(36) NOT NULL,
   `user` varchar(255) NOT NULL,
   `originalname` varchar(255) NOT NULL,
+  `simname` varchar(255) NOT NULL,
   `posglobal` varchar(255) NOT NULL,
   `sortorder` int(2) NOT NULL,
   `enabled` enum('true','false') NOT NULL,
