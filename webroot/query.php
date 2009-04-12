@@ -141,7 +141,7 @@ function pickinforequest($method_name, $params, $app_data)
 				"toppick" => $row["toppick"],
 				"parceluuid" => $row["parceluuid"],
 				"name" => $row["name"],
-				"description" => $row["desc"],
+				"description" => $row["description"],
 				"snapshotuuid" => $row["snapshotuuid"],
 				"user" => $row["user"],
 				"originalname" => $row["originalname"],
@@ -172,7 +172,6 @@ function picks_update($method_name, $params, $app_data)
 	$pickuuid		= $req['pick_id'];
 	$creator		= $req['creator_id'];
 	$toppick		= $req['top_pick'];
-	$parceluuid		= $req['parcel_id'];
 	$name			= $req['name'];
 	$description	= $req['desc'];
 	$snapshotuuid	= $req['snapshot_id']; 
@@ -181,7 +180,49 @@ function picks_update($method_name, $params, $app_data)
 	$simname		= $req['simname'];
 	$posglobal		= $req['posglobal'];
 	$sortorder		= $req['sort_order'];
-	$enable			= $req['enabled'];
+	$enabled		= $req['enabled'];
+
+	// Check if we already have this one in the database
+	$check = mysql_query("select count(*) from userpicks WHERE ".
+			"pickuuid = '". mysql_escape_string($pickuuid) ."'");
+
+	while ($row = mysql_fetch_row($check))
+	{
+		$ready = $row[0];
+	}
+	
+	if ($ready == 0)
+	{
+		// Create a new record for this avatar note		
+		$result = mysql_query("insert into userpicks VALUES ".
+			"('". mysql_escape_string($pickuuid) ."',".
+			"'". mysql_escape_string($creator) ."',".
+			"'". mysql_escape_string($toppick) ."',".
+			"'". mysql_escape_string($parceluuid) ."',".
+			"'". mysql_escape_string($name) ."',".
+			"'". mysql_escape_string($description) ."',".
+			"'". mysql_escape_string($snapshotuuid) ."',".
+			"'". mysql_escape_string($user) ."',".
+			"'". mysql_escape_string($original) ."',".
+			"'". mysql_escape_string($simname) ."',".
+			"'". mysql_escape_string($posglobal) ."',".
+			"'". mysql_escape_string($sortorder) ."',".
+			"'". mysql_escape_string($enabled) ."')");
+	}
+	else
+	{
+		// Update the existing record
+		$result = mysql_query("update userpicks SET ".
+			"parceluuid = '". mysql_escape_string($parceluuid) ."' AND ".
+			"name = '". mysql_escape_string($name) ."' AND ".
+			"description = '". mysql_escape_string($description) ."' AND ".
+			"snapshotuuid = '". mysql_escape_string($snapshotuuid) ."' AND ".
+			"user = '". mysql_escape_string($user) ."' AND ".
+			"originalname = '". mysql_escape_string($original) ."' AND ".
+			"simname = '". mysql_escape_string($simname) ."' AND ".
+			"posglobal = '". mysql_escape_string($posglobal) ."' WHERE ".
+			"pickuuid = '". mysql_escape_string($pickuuid) ."'");
+	}
 
 	$response_xml = xmlrpc_encode(array(
 		'success'	  => True,
