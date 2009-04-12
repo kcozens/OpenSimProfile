@@ -21,8 +21,10 @@ mysql_select_db ($DB_NAME);
 $xmlrpc_server = xmlrpc_server_create();
 
 #
-# Places Query
+# Classifieds
 #
+
+# Avatar Classifieds Request
 
 xmlrpc_server_register_method($xmlrpc_server, "avatarclassifiedsrequest",
 		"avatarclassifiedsrequest");
@@ -55,6 +57,35 @@ function avatarclassifiedsrequest($method_name, $params, $app_data)
 	print $response_xml;
 }
 
+# Classifieds Delete
+
+xmlrpc_server_register_method($xmlrpc_server, "classified_delete",
+		"classified_delete");
+
+function classified_delete($method_name, $params, $app_data)
+{
+	$req 			= $params[0];
+
+	$classifieduuid		= $req['classifiedID'];
+
+	$result = mysql_query("delete from ossearch.classifieds where ".
+			"classifieduuid = '".mysql_escape_string($classifieduuid) ."'");
+	
+	$response_xml = xmlrpc_encode(array(
+		'success'	  => True,
+		'errorMessage' => "",
+		'data' => $data
+	));
+
+	print $response_xml;
+}
+
+#
+# Picks
+#
+
+# Avatar Picks Request
+
 xmlrpc_server_register_method($xmlrpc_server, "avatarpicksrequest",
 		"avatarpicksrequest");
 
@@ -83,35 +114,7 @@ function avatarpicksrequest($method_name, $params, $app_data)
 	print $response_xml;
 }
 
-xmlrpc_server_register_method($xmlrpc_server, "avatarnotesrequest",
-		"avatarnotesrequest");
-
-function avatarnotesrequest($method_name, $params, $app_data)
-{
-	$req 			= $params[0];
-
-	$uuid 			= $req['uuid'];
-	$targetuuid		= $req['avatar_id'];
-
-	$result = mysql_query("select * from usernotes where ".
-			"useruuid = '". mysql_escape_string($uuid) ."' AND ".
-			"targetuuid = '". mysql_escape_string($targetuuid) ."'");
-
-	while (($row = mysql_fetch_assoc($result)))
-	{
-		$data[] = array(
-				"targetid" => $row["targetuuid"],
-				"notes" => $row["notes"]);
-	}
-
-	$response_xml = xmlrpc_encode(array(
-		'success'	  => True,
-		'errorMessage' => "",
-		'data' => $data
-	));
-
-	print $response_xml;
-}
+# Request Picks for User
 
 xmlrpc_server_register_method($xmlrpc_server, "pickinforequest",
 		"pickinforequest");
@@ -154,17 +157,19 @@ function pickinforequest($method_name, $params, $app_data)
 	print $response_xml;
 }
 
-xmlrpc_server_register_method($xmlrpc_server, "classified_delete",
-		"classified_delete");
+# Picks Delete
 
-function classified_delete($method_name, $params, $app_data)
+xmlrpc_server_register_method($xmlrpc_server, "picks_delete",
+		"picks_delete");
+
+function picks_delete($method_name, $params, $app_data)
 {
 	$req 			= $params[0];
 
-	$classifieduuid		= $req['classifiedID'];
+	$pickuuid		= $req['pick_id'];
 
-	$result = mysql_query("delete from ossearch.classifieds where ".
-			"classifieduuid = '".mysql_escape_string($classifieduuid) ."'");
+	$result = mysql_query("delete from userpicks where ".
+			"pickuuid = '".mysql_escape_string($pickuuid) ."'");
 	
 	$response_xml = xmlrpc_encode(array(
 		'success'	  => True,
@@ -175,6 +180,92 @@ function classified_delete($method_name, $params, $app_data)
 	print $response_xml;
 }
 
+#
+# Notes
+#
+
+# Avatar Notes Request
+
+
+xmlrpc_server_register_method($xmlrpc_server, "avatarnotesrequest",
+		"avatarnotesrequest");
+
+function avatarnotesrequest($method_name, $params, $app_data)
+{
+	$req 			= $params[0];
+
+	$uuid 			= $req['uuid'];
+	$targetuuid		= $req['avatar_id'];
+
+	$result = mysql_query("select * from usernotes where ".
+			"useruuid = '". mysql_escape_string($uuid) ."' AND ".
+			"targetuuid = '". mysql_escape_string($targetuuid) ."'");
+
+	while (($row = mysql_fetch_assoc($result)))
+	{
+		$data[] = array(
+				"targetid" => $row["targetuuid"],
+				"notes" => $row["notes"]);
+	}
+
+	$response_xml = xmlrpc_encode(array(
+		'success'	  => True,
+		'errorMessage' => "",
+		'data' => $data
+	));
+
+	print $response_xml;
+}
+
+# Avatar Notes Update
+
+xmlrpc_server_register_method($xmlrpc_server, "avatar_notes_update",
+		"avatar_notes_update");
+
+function avatar_notes_update($method_name, $params, $app_data)
+{
+	$req 			= $params[0];
+
+	$uuid 			= $req['avatar_id'];
+	$targetuuid		= $req['target_id'];
+	$notes			= $req['notes'];
+
+	// Check if we already have this one in the database
+
+	$check = mysql_query("select count(*) from usernotes WHERE ".
+			"useruuid = '". mysql_escape_string($uuid) ."' AND ".
+			"targetuuid = '". mysql_escape_string($targetuuid) ."'");
+
+	while ($row = mysql_fetch_row($check))
+	{
+		$ready = $row[0];
+	}
+	
+	if ($ready == 0)
+	{
+		// Create a new record for this avatar note		
+		$result = mysql_query("insert into usernotes VALUES ".
+			"('". mysql_escape_string($uuid) ."',".
+			"'". mysql_escape_string($targetuuid) ."',".
+			"'". mysql_escape_string($notes) ."')");
+	}
+	else
+	{
+		// Update the existing record
+		$result = mysql_query("update usernotes SET ".
+			"notes = '". mysql_escape_string($notes) ."' WHERE ".
+			"useruuid = '". mysql_escape_string($uuid) ."' AND ".
+			"targetuuid = '". mysql_escape_string($targetuuid) ."'");
+	}
+
+	$response_xml = xmlrpc_encode(array(
+		'success'	  => True,
+		'errorMessage' => "",
+		'data' => $data
+	));
+
+	print $response_xml;
+}
 
 #
 # Process the request
