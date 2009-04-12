@@ -249,6 +249,13 @@ function avatar_notes_update($method_name, $params, $app_data)
 			"'". mysql_escape_string($targetuuid) ."',".
 			"'". mysql_escape_string($notes) ."')");
 	}
+	else if ($notes == "")
+	{
+		// Delete the record for this avatar note		
+		$result = mysql_query("delete from usernotes WHERE ".
+			"useruuid = '". mysql_escape_string($uuid) ."' AND ".
+			"targetuuid = '". mysql_escape_string($targetuuid) ."'");
+	}
 	else
 	{
 		// Update the existing record
