@@ -223,15 +223,15 @@ namespace OpenSimProfile.Modules.OpenProfile
 			Hashtable ReqHash = new Hashtable();
 
 			ReqHash["classifiedUUID"] = queryclassifiedID.ToString();
-			ReqHash["category"] = queryCategory;
+			ReqHash["category"] = queryCategory.ToString();
 			ReqHash["name"] = queryName;
 			ReqHash["description"] = queryDescription;
 			ReqHash["parcelUUID"] = queryParcelID.ToString();
-			ReqHash["parentestate"] = queryParentEstate;
+			ReqHash["parentestate"] = queryParentEstate.ToString();
 			ReqHash["snapshotUUID"] = querySnapshotID.ToString();
-			ReqHash["globalpos"] = queryGlobalPos;
-			ReqHash["classifiedFlags"] = queryclassifiedFlags;
-			ReqHash["classifiedPrice"] = queryclassifiedPrice;
+			ReqHash["globalpos"] = queryGlobalPos.ToString();
+			ReqHash["classifiedFlags"] = queryclassifiedFlags.ToString();
+			ReqHash["classifiedPrice"] = queryclassifiedPrice.ToString();
 
 			Hashtable result = GenericXMLRPCRequest(ReqHash,
 					"classified_update");
@@ -356,6 +356,16 @@ namespace OpenSimProfile.Modules.OpenProfile
 		{
 			Hashtable ReqHash = new Hashtable();
 			
+            ReqHash["agent_id"] = remoteClient.AgentId.ToString();
+            ReqHash["pick_id"] = pickID.ToString();
+            ReqHash["creator_id"] = creatorID.ToString();
+            ReqHash["top_pick"] = topPick.ToString();
+            ReqHash["name"] = name;
+            ReqHash["desc"] = desc;
+            ReqHash["snapshot_id"] = snapshotID.ToString();
+            ReqHash["sort_order"] = sortOrder.ToString();
+            ReqHash["enabled"] = enabled.ToString();
+
 			Hashtable result = GenericXMLRPCRequest(ReqHash,
 					"picks_update");
 
@@ -373,7 +383,7 @@ namespace OpenSimProfile.Modules.OpenProfile
 		{
 			Hashtable ReqHash = new Hashtable();
 			
-			ReqHash["pick_id"] = queryPickID;
+			ReqHash["pick_id"] = queryPickID.ToString();
 
 			Hashtable result = GenericXMLRPCRequest(ReqHash,
 					"picks_delete");
@@ -435,7 +445,7 @@ namespace OpenSimProfile.Modules.OpenProfile
 			Hashtable ReqHash = new Hashtable();
 			
 			ReqHash["avatar_id"] = remoteClient.AgentId.ToString();
-			ReqHash["target_id"] = queryTargetID;
+			ReqHash["target_id"] = queryTargetID.ToString();
 			ReqHash["notes"] = queryNotes;
 
 			Hashtable result = GenericXMLRPCRequest(ReqHash,
