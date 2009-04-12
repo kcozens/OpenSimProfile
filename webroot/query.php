@@ -57,6 +57,9 @@ function avatarclassifiedsrequest($method_name, $params, $app_data)
 	print $response_xml;
 }
 
+# Classifieds Update
+
+
 # Classifieds Delete
 
 xmlrpc_server_register_method($xmlrpc_server, "classified_delete",
@@ -147,6 +150,38 @@ function pickinforequest($method_name, $params, $app_data)
 				"sortorder"=> $row["sortorder"],
 				"enabled" => $row["enabled"]);
 	}
+
+	$response_xml = xmlrpc_encode(array(
+		'success'	  => True,
+		'errorMessage' => "",
+		'data' => $data
+	));
+
+	print $response_xml;
+}
+
+# Picks Update
+
+xmlrpc_server_register_method($xmlrpc_server, "picks_update",
+		"picks_update");
+
+function picks_update($method_name, $params, $app_data)
+{
+	$req 			= $params[0];
+
+	$pickuuid		= $req['pick_id'];
+	$creator		= $req['creator_id'];
+	$toppick		= $req['top_pick'];
+	$parceluuid		= $req['parcel_id'];
+	$name			= $req['name'];
+	$description	= $req['desc'];
+	$snapshotuuid	= $req['snapshot_id']; 
+	$user			= $req['user'];
+	$original		= $req['original'];
+	$simname		= $req['simname'];
+	$posglobal		= $req['posglobal'];
+	$sortorder		= $req['sort_order'];
+	$enable			= $req['enabled'];
 
 	$response_xml = xmlrpc_encode(array(
 		'success'	  => True,

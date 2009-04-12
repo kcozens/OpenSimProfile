@@ -352,7 +352,7 @@ namespace OpenSimProfile.Modules.OpenProfile
 
 		// Picks Update
 
-		public void PickInfoUpdate(IClientAPI remoteClient, UUID pickID, UUID creatorID, bool topPick, string name, string desc, UUID snapshotID, int sortOrder, bool enabled)
+		public void PickInfoUpdate(IClientAPI remoteClient, UUID pickID, UUID creatorID, bool topPick, UUID parcelID, string name, string desc, UUID snapshotID, int sortOrder, bool enabled)
 		{
 			Hashtable ReqHash = new Hashtable();
 			
@@ -360,6 +360,7 @@ namespace OpenSimProfile.Modules.OpenProfile
             ReqHash["pick_id"] = pickID.ToString();
             ReqHash["creator_id"] = creatorID.ToString();
             ReqHash["top_pick"] = topPick.ToString();
+			ReqHash["parcel_id"] = parcelID.ToString();
             ReqHash["name"] = name;
             ReqHash["desc"] = desc;
             ReqHash["snapshot_id"] = snapshotID.ToString();
