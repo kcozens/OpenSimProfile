@@ -90,6 +90,19 @@ namespace OpenSimProfile.Modules.OpenProfile
 			get { return true; }
 		}
 
+        ScenePresence FindPresence(UUID clientID)
+        {
+            ScenePresence p;
+
+            foreach (Scene s in m_Scenes)
+            {
+                p = s.GetScenePresence(clientID);
+                if (!p.IsChildAgent)
+                    return p;
+            }
+            return null;
+        }
+
 		/// New Client Event Handler
 		private void OnNewClient(IClientAPI client)
 		{
@@ -365,6 +378,15 @@ namespace OpenSimProfile.Modules.OpenProfile
             ReqHash["snapshot_id"] = snapshotID.ToString();
             ReqHash["sort_order"] = sortOrder.ToString();
             ReqHash["enabled"] = enabled.ToString();
+            ReqHash["parcel_uuid"] = remoteClient.Scene.RegionInfo.RegionID.ToString();
+            ReqHash["sim_name"] = remoteClient.Scene.RegionInfo.RegionName;
+
+            ScenePresence p = FindPresence(remoteClient.AgentId);
+
+            Vector3 avaPos = p.AbsolutePosition;
+            Vector3 posGlobal = new Vector3(remoteClient.Scene.RegionInfo.RegionLocX*Constants.RegionSize + avaPos.X, remoteClient.Scene.RegionInfo.RegionLocY*Constants.RegionSize + avaPos.Y, avaPos.Z);
+
+            ReqHash["pos_global"] = posGlobal.ToString();
 
 			Hashtable result = GenericXMLRPCRequest(ReqHash,
 					"picks_update");
