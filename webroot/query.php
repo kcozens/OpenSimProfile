@@ -174,11 +174,12 @@ function picks_update($method_name, $params, $app_data)
 	$toppick		= $req['top_pick'];
 	$name			= $req['name'];
 	$description	= $req['desc'];
+	$parceluuid		= $req['parcel_uuid'];
 	$snapshotuuid	= $req['snapshot_id']; 
 	$user			= $req['user'];
 	$original		= $req['original'];
-	$simname		= $req['simname'];
-	$posglobal		= $req['posglobal'];
+	$simname		= $req['sim_name'];
+	$posglobal		= $req['pos_global'];
 	$sortorder		= $req['sort_order'];
 	$enabled		= $req['enabled'];
 
@@ -193,8 +194,31 @@ function picks_update($method_name, $params, $app_data)
 	
 	if ($ready == 0)
 	{
-		// Create a new record for this avatar note		
-		$result = mysql_query("insert into userpicks VALUES ".
+		// Doing some late checking
+		// Should be done by the module but let's see what happens when
+		// I do it here
+
+		if($parceluuid == "")
+		{
+			$parceluuid = "00000000-0000-0000-0000-0000000000000";
+		}
+
+		if($description == "")
+		{
+			$description = "Test";
+		}
+
+		if($user == "")
+		{
+			$user = "Unknown";
+		}
+
+		if($original == "")
+		{
+			$original = "Unknown";
+		}
+		
+		$insertquery = "insert into userpicks VALUES ".
 			"('". mysql_escape_string($pickuuid) ."',".
 			"'". mysql_escape_string($creator) ."',".
 			"'". mysql_escape_string($toppick) ."',".
@@ -207,12 +231,40 @@ function picks_update($method_name, $params, $app_data)
 			"'". mysql_escape_string($simname) ."',".
 			"'". mysql_escape_string($posglobal) ."',".
 			"'". mysql_escape_string($sortorder) ."',".
-			"'". mysql_escape_string($enabled) ."')");
+			"'". mysql_escape_string($enabled) ."')";
+		
+		print $insertquery;
+
+		// Create a new record for this avatar note		
+		$result = mysql_query($insertquery);
 	}
 	else
 	{
-		// Update the existing record
-		$result = mysql_query("update userpicks SET ".
+		// Doing some late checking
+		// Should be done by the module but let's see what happens when
+		// I do it here
+
+		if($parceluuid == "")
+		{
+			$parceluuid = "00000000-0000-0000-0000-0000000000000";
+		}
+
+		if($description == "")
+		{
+			$description = "Test";
+		}
+
+		if($user == "")
+		{
+			$user = "Unknown";
+		}
+
+		if($original == "")
+		{
+			$original = "Unknown";
+		}
+
+		$updatequery = "update userpicks SET ".
 			"parceluuid = '". mysql_escape_string($parceluuid) ."' AND ".
 			"name = '". mysql_escape_string($name) ."' AND ".
 			"description = '". mysql_escape_string($description) ."' AND ".
@@ -221,7 +273,12 @@ function picks_update($method_name, $params, $app_data)
 			"originalname = '". mysql_escape_string($original) ."' AND ".
 			"simname = '". mysql_escape_string($simname) ."' AND ".
 			"posglobal = '". mysql_escape_string($posglobal) ."' WHERE ".
-			"pickuuid = '". mysql_escape_string($pickuuid) ."'");
+			"pickuuid = '". mysql_escape_string($pickuuid) ."'";
+
+		print $updatequery;
+
+		// Update the existing record
+		$result = mysql_query($updatequery);
 	}
 
 	$response_xml = xmlrpc_encode(array(
