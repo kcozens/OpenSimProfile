@@ -384,11 +384,24 @@ namespace OpenSimProfile.Modules.OpenProfile
 
             Vector3 avaPos = p.AbsolutePosition;
 
-            ReqHash["parcel_uuid"] = Util.BuildFakeParcelID(remoteClient.Scene.RegionInfo.RegionHandle, (uint)avaPos.X, (uint)avaPos.Y);
+            // Getting the parceluuid for this parcel
+
+            ReqHash["parcel_uuid"] = p.currentParcelUUID.ToString();
+
+            // Getting the global position for the Avatar
 
             Vector3 posGlobal = new Vector3(remoteClient.Scene.RegionInfo.RegionLocX*Constants.RegionSize + avaPos.X, remoteClient.Scene.RegionInfo.RegionLocY*Constants.RegionSize + avaPos.Y, avaPos.Z);
 
             ReqHash["pos_global"] = posGlobal.ToString();
+
+            // Getting the owner of the parcel
+
+            
+
+            // Getting the description of the parcel
+
+
+            // Do the request
 
 			Hashtable result = GenericXMLRPCRequest(ReqHash,
 					"picks_update");
