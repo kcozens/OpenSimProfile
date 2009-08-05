@@ -154,8 +154,8 @@ namespace OpenSimProfile.Modules.OpenProfile
 			catch (SocketException ex)
 			{
 				m_log.ErrorFormat(
-						"[PROFILE]: Unable to connect to Profile Server {0}. " +
-						"Exception {1}", m_ProfileServer, ex);
+						"[PROFILE]: Unable to connect to Profile Server {0}. Method {1}, params {2}. " +
+						"Exception {3}", m_ProfileServer, method, ReqParams, ex);
 
 				Hashtable ErrorHash = new Hashtable();
 				ErrorHash["success"] = false;
@@ -167,9 +167,8 @@ namespace OpenSimProfile.Modules.OpenProfile
 			catch (XmlException ex)
 			{
 				m_log.ErrorFormat(
-						"[PROFILE]: Unable to connect to Profile Server {0}. " +
-						"Exception {1}", m_ProfileServer, ex);
-
+						"[PROFILE]: Unable to connect to Profile Server {0}. Method {1}, params {2}. " +
+						"Exception {3}", m_ProfileServer, method, ReqParams.ToString(), ex);
 				Hashtable ErrorHash = new Hashtable();
 				ErrorHash["success"] = false;
 				ErrorHash["errorMessage"] = "Unable to search at this time. ";
@@ -235,18 +234,33 @@ namespace OpenSimProfile.Modules.OpenProfile
 		{
 			Hashtable ReqHash = new Hashtable();
 
-			ReqHash["classifiedUUID"] = queryclassifiedID.ToString();
+            ReqHash["creatorUUID"] = remoteClient.AgentId.ToString();
+            ReqHash["classifiedUUID"] = queryclassifiedID.ToString();
 			ReqHash["category"] = queryCategory.ToString();
 			ReqHash["name"] = queryName;
 			ReqHash["description"] = queryDescription;
-			ReqHash["parcelUUID"] = queryParcelID.ToString();
-			ReqHash["parentestate"] = queryParentEstate.ToString();
+            ReqHash["parentestate"] = queryParentEstate.ToString();
 			ReqHash["snapshotUUID"] = querySnapshotID.ToString();
-			ReqHash["globalpos"] = queryGlobalPos.ToString();
-			ReqHash["classifiedFlags"] = queryclassifiedFlags.ToString();
+            ReqHash["sim_name"] = remoteClient.Scene.RegionInfo.RegionName;
+            ReqHash["globalpos"] = queryGlobalPos.ToString();
+            ReqHash["classifiedFlags"] = queryclassifiedFlags.ToString();
 			ReqHash["classifiedPrice"] = queryclassifiedPrice.ToString();
 
-			Hashtable result = GenericXMLRPCRequest(ReqHash,
+            ScenePresence p = FindPresence(remoteClient.AgentId);
+
+            Vector3 avaPos = p.AbsolutePosition;
+
+            // Getting the parceluuid for this parcel
+
+            ReqHash["parcel_uuid"] = p.currentParcelUUID.ToString();
+
+            // Getting the global position for the Avatar
+
+            Vector3 posGlobal = new Vector3(remoteClient.Scene.RegionInfo.RegionLocX * Constants.RegionSize + avaPos.X, remoteClient.Scene.RegionInfo.RegionLocY * Constants.RegionSize + avaPos.Y, avaPos.Z);
+
+            ReqHash["pos_global"] = posGlobal.ToString();
+
+            Hashtable result = GenericXMLRPCRequest(ReqHash,
 					"classified_update");
 
 			if (!Convert.ToBoolean(result["success"]))
@@ -346,6 +360,9 @@ namespace OpenSimProfile.Modules.OpenProfile
 
             Vector3 globalPos = new Vector3();
 			Vector3.TryParse(d["posglobal"].ToString(), out globalPos);
+
+            if (d["description"] == null)
+                d["description"] = String.Empty;
 
 			remoteClient.SendPickInfoReply(
                     new UUID(d["pickuuid"].ToString()),
