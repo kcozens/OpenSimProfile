@@ -59,6 +59,103 @@ function avatarclassifiedsrequest($method_name, $params, $app_data)
 
 # Classifieds Update
 
+xmlrpc_server_register_method($xmlrpc_server, "classified_update",
+		"classified_update");
+
+function classified_update($method_name, $params, $app_data)
+{
+	$req 			= $params[0];
+
+	$classifieduuid = $req['classifiedUUID'];
+	$creator		= $req['creatorUUID'];
+	$category		= $req['category'];
+	$name			= $req['name'];
+	$description	= $req['description'];
+	$parceluuid		= $req['parcelUUID'];
+	$parentestate	= $req['parentestate'];
+	$snapshotuuid	= $req['snapshotUUID'];
+	$simname		= $req['sim_name'];
+	$globalpos		= $req['globalpos'];
+	$parcelname		= $req['parcelname'];
+	$classifiedflag = $req['classifiedFlags'];
+	$priceforlist	= $req['classifiedPrice'];
+	
+	// Check if we already have this one in the database
+	$check = mysql_query("select count(*) from classifieds WHERE ".
+			"classifieduuid = '". mysql_escape_string($classifieduuid) ."'");
+
+	while ($row = mysql_fetch_row($check))
+	{
+		$ready = $row[0];
+	}
+
+	if ($ready == 0)
+	{
+		// Doing some late checking
+		// Should be done by the module but let's see what happens when
+		// I do it here
+
+		if($parcelname == "")
+		{
+			$parcelname = "Unknown";
+		}
+		
+		if($parceluuid == "")
+		{
+			$parceluuid = "00000000-0000-0000-0000-0000000000000";
+		}
+
+		if($description == "")
+		{
+			$description = "No Description";
+		}
+
+		if($classifiedflag == 2)
+		{
+			$creationdate = time();
+			$expirationdate = time() + (7 * 24 * 60 * 60);
+		}
+		else
+		{
+			$creationdate = time();
+			$expirationdate = time() + (365 * 24 * 60 * 60);
+		}
+	
+		$insertquery = "insert into classifieds VALUES ".
+			"('". mysql_escape_string($classifieduuid) ."',".
+			"'". mysql_escape_string($creator) ."',".
+			"". mysql_escape_string($creationdate) .",".
+			"". mysql_escape_string($expirationdate) .",".
+			"'". mysql_escape_string($category) ."',".
+			"'". mysql_escape_string($name) ."',".
+			"'". mysql_escape_string($description) ."',".
+			"'". mysql_escape_string($parceluuid) ."',".
+			"". mysql_escape_string($parentestate) .",".
+			"'". mysql_escape_string($snapshotuuid) ."',".
+			"'". mysql_escape_string($simname) ."',".
+			"'". mysql_escape_string($globalpos) ."',".
+			"'". mysql_escape_string($parcelname) ."',".
+			"". mysql_escape_string($classifiedflag) .",".
+			"". mysql_escape_string($priceforlist) .")";
+		
+		print $insertquery;
+
+		// Create a new record for this avatar note		
+		$result = mysql_query($insertquery);
+	}
+	else
+	{
+
+	}
+	
+	$response_xml = xmlrpc_encode(array(
+		'success'	  => True,
+		'errorMessage' => "",
+		'data' => $data
+	));
+
+	print $response_xml;
+}
 
 # Classifieds Delete
 
@@ -101,8 +198,6 @@ function avatarpicksrequest($method_name, $params, $app_data)
 	$result = mysql_query("select * from userpicks where ".
 			"creatoruuid = '". mysql_escape_string($uuid) ."'");
 
-    $data = array();
-
 	while (($row = mysql_fetch_assoc($result)))
 	{
 		$data[] = array(
@@ -135,15 +230,20 @@ function pickinforequest($method_name, $params, $app_data)
 			"creatoruuid = '". mysql_escape_string($uuid) ."' AND ".
 			"pickuuid = '". mysql_escape_string($pick) ."'");
 
-	if (($row = mysql_fetch_assoc($result)))
+	while (($row = mysql_fetch_assoc($result)))
 	{
+		if ($row["description"] == "")
+		{
+			$row["description"] = "No description given";
+		}
+		
 		$data[] = array(
 				"pickuuid" => $row["pickuuid"],
 				"creatoruuid" => $row["creatoruuid"],
 				"toppick" => $row["toppick"],
 				"parceluuid" => $row["parceluuid"],
 				"name" => $row["name"],
-				"description" => $row["desc"],
+				"description" => $row["description"],
 				"snapshotuuid" => $row["snapshotuuid"],
 				"user" => $row["user"],
 				"originalname" => $row["originalname"],
@@ -151,20 +251,13 @@ function pickinforequest($method_name, $params, $app_data)
 				"posglobal" => $row["posglobal"],
 				"sortorder"=> $row["sortorder"],
 				"enabled" => $row["enabled"]);
-        $response_xml = xmlrpc_encode(array(
-            'success'	  => True,
-            'errorMessage' => "",
-            'data' => $data
-        ));
 	}
-    else
-    {
-        $response_xml = xmlrpc_encode(array(
-            'success'	  => True,
-            'errorMessage' => ""
-        ));
-    }
 
+	$response_xml = xmlrpc_encode(array(
+		'success'	  => True,
+		'errorMessage' => "",
+		'data' => $data
+	));
 
 	print $response_xml;
 }
@@ -185,10 +278,8 @@ function picks_update($method_name, $params, $app_data)
 	$description	= $req['desc'];
 	$parceluuid		= $req['parcel_uuid'];
 	$snapshotuuid	= $req['snapshot_id']; 
-#	$user			= $req['user'];
-#	$original		= $req['original'];
-    $user = "";
-    $original = $name;
+	$user			= $req['user'];
+	$original		= $req['original'];
 	$simname		= $req['sim_name'];
 	$posglobal		= $req['pos_global'];
 	$sortorder		= $req['sort_order'];
@@ -216,7 +307,7 @@ function picks_update($method_name, $params, $app_data)
 
 		if($description == "")
 		{
-			$description = "";
+			$description = "No Description";
 		}
 
 		if($user == "")
@@ -244,6 +335,8 @@ function picks_update($method_name, $params, $app_data)
 			"'". mysql_escape_string($sortorder) ."',".
 			"'". mysql_escape_string($enabled) ."')";
 		
+		//print $insertquery;
+
 		// Create a new record for this avatar note		
 		$result = mysql_query($insertquery);
 	}
@@ -255,7 +348,12 @@ function picks_update($method_name, $params, $app_data)
 
 		if($parceluuid == "")
 		{
-			$parceluuid = "00000000-0000-0000-0000-0000000000000";
+			$parceluuid = "00000000-0000-0000-0000-00000000000";
+		}
+
+		if($description == "")
+		{
+			$description = "Test";
 		}
 
 		if($user == "")
@@ -268,21 +366,38 @@ function picks_update($method_name, $params, $app_data)
 			$original = "Unknown";
 		}
 
-		$updatequery = "update userpicks SET ".
-			"name = '". mysql_escape_string($name) ."' , ".
-			"`desc` = '". mysql_escape_string($description) ."' , ".
-			"snapshotuuid = '". mysql_escape_string($snapshotuuid) ."' , ".
-			"simname = '". mysql_escape_string($simname) ."' , ".
-			"posglobal = '". mysql_escape_string($posglobal) ."' WHERE ".
+		$updatequery1 = "update userpicks SET ".
+			"parceluuid = '". mysql_escape_string($parceluuid) ."' WHERE ".
 			"pickuuid = '". mysql_escape_string($pickuuid) ."'";
 
+		$updatequery2 = "update userpicks SET ".
+			"name = '". mysql_escape_string($name) ."' WHERE ".
+			"pickuuid = '". mysql_escape_string($pickuuid) ."'";
+
+		$updatequery3 = "update userpicks SET ".
+			"description = '". mysql_escape_string($description) ."' WHERE ".
+			"pickuuid = '". mysql_escape_string($pickuuid) ."'";
+
+		$updatequery4 = "update userpicks SET ".
+			"snapshotuuid = '". mysql_escape_string($snapshotuuid) ."' WHERE ".
+			"pickuuid = '". mysql_escape_string($pickuuid) ."'";
+		
+		//print $updatequery1."\r\n";
+		//print $updatequery2."\r\n";
+		//print $updatequery3."\r\n";
+		//print $updatequery4."\r\n";
+
 		// Update the existing record
-		$result = mysql_query($updatequery);
+		$resultQ1 = mysql_query($updatequery1);
+		$resultQ2 = mysql_query($updatequery2);
+		$resultQ3 = mysql_query($updatequery3);
+		$resultQ4 = mysql_query($updatequery4);
 	}
 
 	$response_xml = xmlrpc_encode(array(
 		'success'	  => True,
-		'errorMessage' => ""
+		'errorMessage' => "",
+		'data' => $data
 	));
 
 	print $response_xml;
@@ -304,7 +419,8 @@ function picks_delete($method_name, $params, $app_data)
 	
 	$response_xml = xmlrpc_encode(array(
 		'success'	  => True,
-		'errorMessage' => ""
+		'errorMessage' => "",
+		'data' => $data
 	));
 
 	print $response_xml;
@@ -331,22 +447,12 @@ function avatarnotesrequest($method_name, $params, $app_data)
 			"useruuid = '". mysql_escape_string($uuid) ."' AND ".
 			"targetuuid = '". mysql_escape_string($targetuuid) ."'");
 
-	if (($row = mysql_fetch_assoc($result)))
+	while (($row = mysql_fetch_assoc($result)))
 	{
 		$data[] = array(
 				"targetid" => $row["targetuuid"],
 				"notes" => $row["notes"]);
 	}
-    else
-    {
-        $response_xml = xmlrpc_encode(array(
-            'success'	  => True,
-            'errorMessage' => ""
-        ));
-
-        print $response_xml;
-        return;
-    }
 
 	$response_xml = xmlrpc_encode(array(
 		'success'	  => True,
@@ -407,7 +513,8 @@ function avatar_notes_update($method_name, $params, $app_data)
 
 	$response_xml = xmlrpc_encode(array(
 		'success'	  => True,
-		'errorMessage' => ""
+		'errorMessage' => "",
+		'data' => $data
 	));
 
 	print $response_xml;
