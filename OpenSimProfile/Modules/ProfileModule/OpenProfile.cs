@@ -17,7 +17,7 @@ using OpenSim.Framework.Communications.Cache;
 
 namespace OpenSimProfile.Modules.OpenProfile
 {
-	public class OpenProfileModule : IRegionModule
+	public class OpenProfileModule : IRegionModule, IProfileModule
 	{
 		//
 		// Log module
@@ -68,6 +68,8 @@ namespace OpenSimProfile.Modules.OpenProfile
 
 			// Hook up events
 			scene.EventManager.OnNewClient += OnNewClient;
+
+            scene.RegisterModuleInterface<IProfileModule>(this);
 		}
 
 		public void PostInitialise()
@@ -512,5 +514,10 @@ namespace OpenSimProfile.Modules.OpenProfile
 				return;
 			}
 		}
+
+        Hashtable GetProfileData(UUID userID)
+        {
+            return new Hashtable();
+        }
 	}
 }
