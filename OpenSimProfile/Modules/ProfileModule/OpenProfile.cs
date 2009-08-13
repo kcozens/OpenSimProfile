@@ -515,7 +515,7 @@ namespace OpenSimProfile.Modules.OpenProfile
 			}
 		}
 
-        Hashtable GetProfileData(UUID userID)
+        public Hashtable GetProfileData(UUID userID)
         {
             return new Hashtable();
         }
