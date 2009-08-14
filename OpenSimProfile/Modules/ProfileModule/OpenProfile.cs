@@ -517,7 +517,21 @@ namespace OpenSimProfile.Modules.OpenProfile
 
         public Hashtable GetProfileData(UUID userID)
         {
-            return new Hashtable();
+            Hashtable ReqHash = new Hashtable();
+
+            ReqHash["avatar_id"] = userID.ToString();
+
+            Hashtable result = GenericXMLRPCRequest(ReqHash,
+                    "profile_request");
+            
+            ArrayList dataArray = (ArrayList)result["data"];
+
+            if (dataArray != null && dataArray[0] != null)
+            {
+                Hashtable d = (Hashtable)dataArray[0];
+            }
+
+            return result;
         }
 	}
 }

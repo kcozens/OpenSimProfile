@@ -520,6 +520,35 @@ function avatar_notes_update($method_name, $params, $app_data)
 	print $response_xml;
 }
 
+# Profile bits
+
+xmlrpc_server_register_method($xmlrpc_server, "profile_request",
+		"profile_request");
+
+function profile_request($method_name, $params, $app_data)
+{
+	$req 			= $params[0];
+
+	$uuid 			= $req['avatar_id'];
+
+	$result = mysql_query("select profileURL from userprofile where ".
+			"useruuid = '". mysql_escape_string($uuid) ."'");
+
+	while (($row = mysql_fetch_assoc($result)))
+	{
+		$data[] = array(
+				"ProfileUrl" => $row["profileURL"]);
+	}
+
+	$response_xml = xmlrpc_encode(array(
+		'data' => $data
+	));
+
+	print $response_xml;
+}
+
+
+
 #
 # Process the request
 #

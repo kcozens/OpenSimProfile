@@ -142,3 +142,19 @@ CREATE TABLE `userpicks` (
   `enabled` enum('true','false') NOT NULL,
   PRIMARY KEY  (`pickuuid`)
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+
+CREATE TABLE IF NOT EXISTS `userprofile` (
+  `useruuid` varchar(36) NOT NULL,
+  `profilePartner` varchar(36) NOT NULL,
+  `profileAllowPublish` binary(1) NOT NULL,
+  `profileMaturePublish` binary(1) NOT NULL,
+  `profileURL` varchar(255) NOT NULL,
+  `profileWantToMask` int(3) NOT NULL,
+  `profileWantToText` text NOT NULL,
+  `profileSkillsMask` int(3) NOT NULL,
+  `profileSkillsText` text NOT NULL,
+  `profileLanguages` text NOT NULL,
+  `profileFirstImage` varchar(36) NOT NULL,
+  `profileFirstText` text NOT NULL,
+  PRIMARY KEY (`useruuid`)
+) ENGINE=MyISAM DEFAULT CHARSET=latin1;
