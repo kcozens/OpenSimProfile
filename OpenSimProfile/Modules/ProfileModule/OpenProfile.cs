@@ -529,8 +529,8 @@ namespace OpenSimProfile.Modules.OpenProfile
             if (dataArray != null && dataArray[0] != null)
             {
                 Hashtable d = (Hashtable)dataArray[0];
+                return d;
             }
-
             return result;
         }
 	}
