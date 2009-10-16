@@ -124,6 +124,10 @@ namespace OpenSimProfile.Modules.OpenProfile
 			// Notes
 			client.AddGenericPacketHandler("avatarnotesrequest", HandleAvatarNotesRequest);
 			client.OnAvatarNotesUpdate += AvatarNotesUpdate;
+
+            //Profile
+            //client.OnAvatarInterestRequest += AvatarInterestRequest;
+            client.OnAvatarInterestUpdate += AvatarInterestsUpdate;
 		}
 
 		//
@@ -514,7 +518,31 @@ namespace OpenSimProfile.Modules.OpenProfile
 				return;
 			}
 		}
+        
+        // Standard Profile bits
+        public void AvatarInterestsUpdate(IClientAPI remoteClient, uint wantmask, string wanttext, uint skillsmask, string skillstext, string languages)
+        {
+            Hashtable ReqHash = new Hashtable();
 
+            ReqHash["avatar_id"] = remoteClient.AgentId.ToString();
+            ReqHash["wantmask"] = wantmask.ToString();
+            ReqHash["wanttext"] = wanttext;
+            ReqHash["skillsmask"] = skillsmask.ToString();
+            ReqHash["skillstext"] = skillstext;
+            ReqHash["languages"] = languages;
+
+            Hashtable result = GenericXMLRPCRequest(ReqHash,
+                    "avatar_interests_update");
+
+            if (!Convert.ToBoolean(result["success"]))
+            {
+                remoteClient.SendAgentAlertMessage(
+                        result["errorMessage"].ToString(), false);
+                return;
+            }
+        }
+
+        // Profile data like the WebURL
         public Hashtable GetProfileData(UUID userID)
         {
             Hashtable ReqHash = new Hashtable();
@@ -522,7 +550,7 @@ namespace OpenSimProfile.Modules.OpenProfile
             ReqHash["avatar_id"] = userID.ToString();
 
             Hashtable result = GenericXMLRPCRequest(ReqHash,
-                    "profile_request");
+                    "avatar_properties_request");
             
             ArrayList dataArray = (ArrayList)result["data"];
 
