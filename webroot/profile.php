@@ -522,10 +522,10 @@ function avatar_notes_update($method_name, $params, $app_data)
 
 # Profile bits
 
-xmlrpc_server_register_method($xmlrpc_server, "profile_request",
-		"profile_request");
+xmlrpc_server_register_method($xmlrpc_server, "avatar_properties_request",
+		"avatar_properties_request");
 
-function profile_request($method_name, $params, $app_data)
+function avatar_properties_request($method_name, $params, $app_data)
 {
 	$req 			= $params[0];
 
@@ -548,6 +548,47 @@ function profile_request($method_name, $params, $app_data)
 }
 
 
+// Profile Interests
+
+xmlrpc_server_register_method($xmlrpc_server, "avatar_interests_request",
+		"avatar_interests_request");
+
+function avatar_interests_request($method_name, $params, $app_data)
+{
+	$req 			= $params[0];
+
+	$uuid 			= $req['avatar_id'];
+
+	while (($row = mysql_fetch_assoc($result)))
+	{
+		$data[] = array(
+				"ProfileUrl" => $row["profileURL"]);
+	}
+
+	$response_xml = xmlrpc_encode(array(
+		'data' => $data
+	));
+
+	print $response_xml;
+}
+
+xmlrpc_server_register_method($xmlrpc_server, "avatar_interests_update",
+		"avatar_interests_update");
+
+function avatar_interests_update($method_name, $params, $app_data)
+{
+	$req 			= $params[0];
+
+	$uuid 			= $req['avatar_id'];
+
+	$response_xml = xmlrpc_encode(array(
+		'success'	  => True,
+		'errorMessage' => "",
+		'data' => $data
+	));
+
+	print $response_xml;
+}
 
 #
 # Process the request
