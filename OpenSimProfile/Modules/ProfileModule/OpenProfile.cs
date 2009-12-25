@@ -43,20 +43,18 @@ namespace OpenSimProfile.Modules.OpenProfile
 			{
 				if (profileConfig == null)
 				{
-					m_log.Info("[PROFILE] Not configured, disabling");
 					m_Enabled = false;
 					return;
 				}
 				m_ProfileServer = profileConfig.GetString("ProfileURL", "");
 				if (m_ProfileServer == "")
 				{
-					m_log.Error("[PROFILE] No profile server, disabling profiles");
 					m_Enabled = false;
 					return;
 				}
 				else
 				{
-					m_log.Info("[PROFILE] Profile module is activated");
+					m_log.Info("[PROFILE] OSProfile module is activated");
 					m_Enabled = true;
 				}
 			}
