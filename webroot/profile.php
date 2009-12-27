@@ -138,9 +138,7 @@ function classified_update($method_name, $params, $app_data)
 			"". mysql_escape_string($classifiedflag) .",".
 			"". mysql_escape_string($priceforlist) .")";
 		
-		print $insertquery;
-
-		// Create a new record for this avatar note		
+		// Create a new record for this classified
 		$result = mysql_query($insertquery);
 	}
 	else
@@ -382,11 +380,6 @@ function picks_update($method_name, $params, $app_data)
 			"snapshotuuid = '". mysql_escape_string($snapshotuuid) ."' WHERE ".
 			"pickuuid = '". mysql_escape_string($pickuuid) ."'";
 		
-		//print $updatequery1."\r\n";
-		//print $updatequery2."\r\n";
-		//print $updatequery3."\r\n";
-		//print $updatequery4."\r\n";
-
 		// Update the existing record
 		$resultQ1 = mysql_query($updatequery1);
 		$resultQ2 = mysql_query($updatequery2);
@@ -531,8 +524,8 @@ function avatar_properties_request($method_name, $params, $app_data)
 
 	$uuid 			= $req['avatar_id'];
 
-	$result = mysql_query("select profileURL from userprofile where ".
-			"useruuid = '". mysql_escape_string($uuid) ."'");
+	$result = mysql_query("select profileURL from opensim.users where ".
+			"UUID = '". mysql_escape_string($uuid) ."'");
 
 	while (($row = mysql_fetch_assoc($result)))
 	{
@@ -580,7 +573,78 @@ function avatar_interests_update($method_name, $params, $app_data)
 	$req 			= $params[0];
 
 	$uuid 			= $req['avatar_id'];
+	$skillstext		= $req['skillstext'];
+	$skillsmask		= $req['skillsmask'];
+	$languages		= $req['languages'];
+	$wanttext		= $req['wanttext'];
+	$wantmask		= $req['wantmask'];
 
+	$result = mysql_query("update userprofile set ".
+			"profileCanDoMask = ". mysql_escape_string($skillsmask) .",".
+			"profileCanDoText = '". mysql_escape_string($skillstext) ."',".
+			"profileWantDoMask = ". mysql_escape_string($wantmask) .",".
+			"profileWantDoText = '". mysql_escape_string($wanttext) ."',".
+			"profileLanguagesText = '". mysql_escape_string($languages) ."' ".
+			"where useruuid = '". mysql_escape_string($uuid) ."'"
+		);
+
+	$response_xml = xmlrpc_encode(array(
+		'success'	  => True,
+		'errorMessage' => "",
+		'data' => $data
+	));
+
+	print $response_xml;
+}
+
+// User Preferences
+
+xmlrpc_server_register_method($xmlrpc_server, "user_preferences_request",
+		"user_preferences_request");
+
+function user_preferences_request($method_name, $params, $app_data)
+{
+	$req 			= $params[0];
+
+	$uuid 			= $req['avatar_id'];
+
+	$result = mysql_query("select imviaemail,visible,email from usersettings where ".
+			"useruuid = '". mysql_escape_string($uuid) ."'");
+	
+	while (($row = mysql_fetch_assoc($result)))
+	{
+		$data[] = array(
+				"imviaemail" => $row["imviaemail"],
+				"visible" => $row["visible"],
+				"email" => $row["email"]);
+	}
+
+	$response_xml = xmlrpc_encode(array(
+		'success'	  => True,
+		'errorMessage' => "",
+		'data' => $data
+	));
+
+	print $response_xml;
+}
+
+xmlrpc_server_register_method($xmlrpc_server, "user_preferences_update",
+		"user_preferences_update");
+
+function user_preferences_update($method_name, $params, $app_data)
+{
+
+	$req 			= $params[0];
+
+	$uuid 			= $req['avatar_id'];
+	$wantim			= $req['imViaEmail'];
+	$directory		= $req['visible'];
+
+	$result = mysql_query("update usersettings set ".
+			"imviaemail = '".mysql_escape_string($wantim) ."', ".
+			"visible = '".mysql_escape_string($directory) ."' where ".
+			"useruuid = '". mysql_escape_string($uuid) ."'");
+	
 	$response_xml = xmlrpc_encode(array(
 		'success'	  => True,
 		'errorMessage' => "",
