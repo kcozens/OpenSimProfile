@@ -54,7 +54,7 @@ namespace OpenSimProfile.Modules.OpenProfile
 				}
 				else
 				{
-					m_log.Info("[PROFILE] OSProfile module is activated");
+					m_log.Info("[PROFILE] OpenProfile module is activated");
 					m_Enabled = true;
 				}
 			}
@@ -126,6 +126,8 @@ namespace OpenSimProfile.Modules.OpenProfile
             //Profile
             //client.OnAvatarInterestRequest += AvatarInterestRequest;
             client.OnAvatarInterestUpdate += AvatarInterestsUpdate;
+            client.OnUserInfoRequest += UserPreferencesRequest;
+            client.OnUpdateUserInfo += UpdateUserPreferences;
 		}
 
 		//
@@ -531,6 +533,54 @@ namespace OpenSimProfile.Modules.OpenProfile
 
             Hashtable result = GenericXMLRPCRequest(ReqHash,
                     "avatar_interests_update");
+
+            if (!Convert.ToBoolean(result["success"]))
+            {
+                remoteClient.SendAgentAlertMessage(
+                        result["errorMessage"].ToString(), false);
+                return;
+            }
+        }
+
+        public void UserPreferencesRequest(IClientAPI remoteClient)
+        {
+            Hashtable ReqHash = new Hashtable();
+
+            ReqHash["avatar_id"] = remoteClient.AgentId.ToString();
+            
+            Hashtable result = GenericXMLRPCRequest(ReqHash,
+                    "user_preferences_request");
+
+            if (!Convert.ToBoolean(result["success"]))
+            {
+                remoteClient.SendAgentAlertMessage(
+                        result["errorMessage"].ToString(), false);
+                return;
+            }
+
+            ArrayList dataArray = (ArrayList)result["data"];
+
+            if (dataArray != null && dataArray[0] != null)
+            {
+                Hashtable d = (Hashtable)dataArray[0];
+
+                remoteClient.SendUserInfoReply(
+                        Convert.ToBoolean(d["imviaemail"]), 
+                        Convert.ToBoolean(d["visible"]), 
+                        d["email"].ToString());
+            }
+        }
+
+        public void UpdateUserPreferences(bool imViaEmail, bool visible, IClientAPI remoteClient)
+        {
+            Hashtable ReqHash = new Hashtable();
+
+            ReqHash["avatar_id"] = remoteClient.AgentId.ToString();
+            ReqHash["imViaEmail"] = imViaEmail.ToString();
+            ReqHash["visible"] = visible.ToString();
+
+            Hashtable result = GenericXMLRPCRequest(ReqHash,
+                    "user_preferences_update");
 
             if (!Convert.ToBoolean(result["success"]))
             {
