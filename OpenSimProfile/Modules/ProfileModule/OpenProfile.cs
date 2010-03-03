@@ -13,11 +13,11 @@ using Nwc.XmlRpc;
 using OpenSim.Framework;
 using OpenSim.Region.Framework.Interfaces;
 using OpenSim.Region.Framework.Scenes;
-using OpenSim.Framework.Communications.Cache;
+using OpenSim.Services.Interfaces;
 
 namespace OpenSimProfile.Modules.OpenProfile
 {
-	public class OpenProfileModule : IRegionModule, IProfileModule
+	public class OpenProfileModule : IRegionModule
 	{
 		//
 		// Log module
@@ -66,8 +66,6 @@ namespace OpenSimProfile.Modules.OpenProfile
 
 			// Hook up events
 			scene.EventManager.OnNewClient += OnNewClient;
-
-            scene.RegisterModuleInterface<IProfileModule>(this);
 		}
 
 		public void PostInitialise()
@@ -124,7 +122,8 @@ namespace OpenSimProfile.Modules.OpenProfile
 			client.OnAvatarNotesUpdate += AvatarNotesUpdate;
 
             //Profile
-            //client.OnAvatarInterestRequest += AvatarInterestRequest;
+            client.OnRequestAvatarProperties += RequestAvatarProperties;
+            client.OnUpdateAvatarProperties += UpdateAvatarProperties;
             client.OnAvatarInterestUpdate += AvatarInterestsUpdate;
             client.OnUserInfoRequest += UserPreferencesRequest;
             client.OnUpdateUserInfo += UpdateUserPreferences;
@@ -591,7 +590,7 @@ namespace OpenSimProfile.Modules.OpenProfile
         }
 
         // Profile data like the WebURL
-        public Hashtable GetProfileData(UUID userID)
+        private Hashtable GetProfileData(UUID userID)
         {
             Hashtable ReqHash = new Hashtable();
 
@@ -608,6 +607,81 @@ namespace OpenSimProfile.Modules.OpenProfile
                 return d;
             }
             return result;
+        }
+
+        public void RequestAvatarProperties(IClientAPI remoteClient, UUID avatarID)
+        {
+            IScene s = remoteClient.Scene;
+            if (!(s is Scene))
+                return;
+
+            Scene scene = (Scene)s;
+
+            UserAccount account = scene.UserAccountService.GetUserAccount(scene.RegionInfo.ScopeID, avatarID);
+            if (null != account)
+            {
+                Byte[] charterMember;
+                if (account.UserTitle == "")
+                {
+                    charterMember = new Byte[1];
+                    charterMember[0] = (Byte)((account.UserFlags & 0xf00) >> 8);
+                }
+                else
+                {
+                    charterMember = Utils.StringToBytes(account.UserTitle);
+                }
+
+                Hashtable profileData = GetProfileData(remoteClient.AgentId);
+                string profileUrl = String.Empty;
+                string aboutText = String.Empty;
+                string firstLifeAboutText = String.Empty;
+                UUID firstLifeImage = UUID.Zero;
+                UUID image = UUID.Zero;
+                UUID partner = UUID.Zero;
+
+                if (profileData["ProfileUrl"] != null)
+                    profileUrl = profileData["ProfileUrl"].ToString();
+                if (profileData["AboutText"] != null)
+                    aboutText = profileData["AboutText"].ToString();
+                if (profileData["FirstLifeAboutText"] != null)
+                    firstLifeAboutText = profileData["FirstLifeAboutText"].ToString();
+                if (profileData["FirstLifeImage"] != null)
+                    firstLifeImage = new UUID(profileData["FirstLifeImage"].ToString());
+                if (profileData["Image"] != null)
+                    image = new UUID(profileData["Image"].ToString());
+                if (profileData["Partner"] != null)
+                    partner = new UUID(profileData["Partner"].ToString());
+
+                // The PROFILE information is no longer stored in the user
+                // account. It now needs to be taken from the XMLRPC
+                //
+                remoteClient.SendAvatarProperties(avatarID, aboutText,
+                          Util.ToDateTime(account.Created).ToString(
+                                  "M/d/yyyy", CultureInfo.InvariantCulture),
+                          charterMember, firstLifeAboutText,
+                          (uint)(account.UserFlags & 0xff),
+                          firstLifeImage, image, profileUrl, partner);
+            }
+            else
+            {
+                m_log.Debug("[AvatarProfilesModule]: Got null for profile for " + avatarID.ToString());
+            }
+        }
+        public void UpdateAvatarProperties(IClientAPI remoteClient, UserProfileData newProfile)
+        {
+            // if it's the profile of the user requesting the update, then we change only a few things.
+            if (remoteClient.AgentId == newProfile.ID)
+            {
+                string image = newProfile.Image.ToString();
+                string firstLifeImage = newProfile.FirstLifeImage.ToString();
+                string aboutText = newProfile.AboutText;
+                string firstLifeAboutText = newProfile.FirstLifeAboutText;
+                string profileUrl = newProfile.ProfileUrl;
+
+                // TODO: Write the above to the server!!!!!
+
+                RequestAvatarProperties(remoteClient, newProfile.ID);
+            }
         }
 	}
 }
