@@ -188,10 +188,10 @@ function avatarpicksrequest($method_name, $params, $app_data)
 
     $uuid           = $req['uuid'];
 
-    $result = mysql_query("SELECT * FROM userpicks WHERE ".
-            "creatoruuid = '". mysql_escape_string($uuid) ."'");
-
     $data = array();
+
+    $result = mysql_query("SELECT `pickuuid`,`name` FROM userpicks WHERE ".
+            "creatoruuid = '". mysql_escape_string($uuid) ."'");
 
     while (($row = mysql_fetch_assoc($result)))
     {
@@ -220,16 +220,16 @@ function pickinforequest($method_name, $params, $app_data)
     $uuid           = $req['avatar_id'];
     $pick           = $req['pick_id'];
 
+    $data = array();
+
     $result = mysql_query("SELECT * FROM userpicks WHERE ".
             "creatoruuid = '". mysql_escape_string($uuid) ."' AND ".
             "pickuuid = '". mysql_escape_string($pick) ."'");
 
-    $data = array();
-
     $row = mysql_fetch_assoc($result);
     if ($row != FALSE)
     {
-        if ($row["description"] == "")
+        if ($row["description"] == null || $row["description"] == "")
             $row["description"] = "No description given";
 
         $data[] = array(
@@ -275,11 +275,19 @@ function picks_update($method_name, $params, $app_data)
     $parceluuid     = $req['parcel_uuid'];
     $snapshotuuid   = $req['snapshot_id'];
     $user           = $req['user'];
-    $original       = $req['original'];
     $simname        = $req['sim_name'];
     $posglobal      = $req['pos_global'];
     $sortorder      = $req['sort_order'];
     $enabled        = $req['enabled'];
+
+    if($parceluuid == "")
+        $parceluuid = $zeroUUID;
+
+    if($description == "")
+        $description = "No Description";
+
+    $sql = "SELECT COUNT(*) FROM userpicks WHERE ".
+            "pickuuid = '". mysql_escape_string($pickuuid) ."'";
 
     // Check if we already have this one in the database
     $check = mysql_query("SELECT COUNT(*) FROM userpicks WHERE ".
@@ -289,23 +297,14 @@ function picks_update($method_name, $params, $app_data)
 
     if ($row[0] == 0)
     {
-        // Doing some late checking
-        // Should be done by the module but let's see what happens when
-        // I do it here
-
-        if($parceluuid == "")
-            $parceluuid = $zeroUUID;
-
-        if($description == "")
-            $description = "No Description";
-
-        if($user == "")
+        if($user == null || $user == "")
             $user = "Unknown";
 
-        if($original == "")
-            $original = "Unknown";
+        //The original parcel name is the same as the name of the
+        //profile pick when a new profile pick is being created.
+        $original = $name;
 
-        $insertquery = "INSERT INTO userpicks VALUES ".
+        $query = "INSERT INTO userpicks VALUES ".
             "('". mysql_escape_string($pickuuid) ."',".
             "'". mysql_escape_string($creator) ."',".
             "'". mysql_escape_string($toppick) ."',".
@@ -319,40 +318,20 @@ function picks_update($method_name, $params, $app_data)
             "'". mysql_escape_string($posglobal) ."',".
             "'". mysql_escape_string($sortorder) ."',".
             "'". mysql_escape_string($enabled) ."')";
-
-        //print $insertquery;
-
-        // Create a new record for this avatar note
-        $result = mysql_query($insertquery);
     }
     else
     {
-        // Doing some late checking
-        // Should be done by the module but let's see what happens when
-        // I do it here
-
-        if($parceluuid == "")
-            $parceluuid = $zeroUUID;
-
-        if($description == "")
-            $description = "Test";
-
-        if($user == "")
-            $user = "Unknown";
-
-        if($original == "")
-            $original = "Unknown";
-
-        $updatequery1 = "UPDATE userpicks SET " .
+        $query = "UPDATE userpicks SET " .
             "parceluuid = '". mysql_escape_string($parceluuid) . "', " .
             "name = '". mysql_escape_string($name) . "', " .
             "description = '". mysql_escape_string($description) . "', " .
             "snapshotuuid = '". mysql_escape_string($snapshotuuid) . "' WHERE ".
             "pickuuid = '". mysql_escape_string($pickuuid) ."'";
-
-        // Update the existing record
-        $result = mysql_query($updatequery);
     }
+
+    $result = mysql_query($query);
+    if ($result != FALSE)
+        $result = True;
 
     $response_xml = xmlrpc_encode(array(
         'success' => $result,
@@ -375,6 +354,9 @@ function picks_delete($method_name, $params, $app_data)
 
     $result = mysql_query("DELETE FROM userpicks WHERE ".
             "pickuuid = '".mysql_escape_string($pickuuid) ."'");
+
+    if ($result != FALSE)
+        $result = True;
 
     $response_xml = xmlrpc_encode(array(
         'success' => $result,
