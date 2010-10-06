@@ -627,9 +627,14 @@ namespace OpenSimProfile.Modules.OpenProfile
                 string profileUrl = String.Empty;
                 string aboutText = String.Empty;
                 string firstLifeAboutText = String.Empty;
-                UUID firstLifeImage = UUID.Zero;
                 UUID image = UUID.Zero;
+                UUID firstLifeImage = UUID.Zero;
                 UUID partner = UUID.Zero;
+                uint   wantMask = 0;
+                string wantText = "";
+                uint   skillsMask = 0;
+                string skillsText = "";
+                string languages = "";
 
                 if (profileData["ProfileUrl"] != null)
                     profileUrl = profileData["ProfileUrl"].ToString();
@@ -637,10 +642,10 @@ namespace OpenSimProfile.Modules.OpenProfile
                     aboutText = profileData["AboutText"].ToString();
                 if (profileData["FirstLifeAboutText"] != null)
                     firstLifeAboutText = profileData["FirstLifeAboutText"].ToString();
-                if (profileData["FirstLifeImage"] != null)
-                    firstLifeImage = new UUID(profileData["FirstLifeImage"].ToString());
                 if (profileData["Image"] != null)
                     image = new UUID(profileData["Image"].ToString());
+                if (profileData["FirstLifeImage"] != null)
+                    firstLifeImage = new UUID(profileData["FirstLifeImage"].ToString());
                 if (profileData["Partner"] != null)
                     partner = new UUID(profileData["Partner"].ToString());
 
@@ -653,12 +658,30 @@ namespace OpenSimProfile.Modules.OpenProfile
                           charterMember, firstLifeAboutText,
                           (uint)(account.UserFlags & 0xff),
                           firstLifeImage, image, profileUrl, partner);
+
+                //Viewer expects interest data when it asks for properties.
+                if (profileData["wantmask"] != null)
+                    wantMask = Convert.ToUInt32(profileData["wantmask"].ToString());
+                if (profileData["wanttext"] != null)
+                    wantText = profileData["wanttext"].ToString();
+
+                if (profileData["skillsmask"] != null)
+                    skillsMask = Convert.ToUInt32(profileData["skillsmask"].ToString());
+                if (profileData["skillstext"] != null)
+                    skillsText = profileData["skillstext"].ToString();
+
+                if (profileData["languages"] != null)
+                    languages = profileData["languages"].ToString();
+
+                remoteClient.SendAvatarInterestsReply(avatarID, wantMask, wantText,
+                                                      skillsMask, skillsText, languages);
             }
             else
             {
                 m_log.Debug("[AvatarProfilesModule]: Got null for profile for " + avatarID.ToString());
             }
         }
+
         public void UpdateAvatarProperties(IClientAPI remoteClient, UserProfileData newProfile)
         {
             // if it's the profile of the user requesting the update, then we change only a few things.

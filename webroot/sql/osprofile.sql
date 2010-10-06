@@ -52,6 +52,8 @@ CREATE TABLE IF NOT EXISTS `userprofile` (
   `profileSkillsMask` int(3) NOT NULL,
   `profileSkillsText` text NOT NULL,
   `profileLanguages` text NOT NULL,
+  `profileImage` varchar(36) NOT NULL,
+  `profileAboutText` text NOT NULL,
   `profileFirstImage` varchar(36) NOT NULL,
   `profileFirstText` text NOT NULL,
   PRIMARY KEY (`useruuid`)

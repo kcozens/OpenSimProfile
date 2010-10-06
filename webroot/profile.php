@@ -492,11 +492,13 @@ function avatar_properties_request($method_name, $params, $app_data)
         //FIXME: Should this only be done when asking for ones own profile?
         $sql = "INSERT INTO userprofile VALUES ( ".
                 "'". mysql_escape_string($uuid) ."', ".
-                "'$zeroUUID', 0, 0, '', 0, '', 0, '', '', '$zeroUUID', '')";
+                "'$zeroUUID', 0, 0, '', 0, '', 0, '', '', ".
+                "'$zeroUUID', '', '$zeroUUID', '')";
         $result = mysql_query($sql);
 
         $data[] = array(
                 "ProfileUrl" => "",
+
                 "wantmask"   => 0,
                 "wanttext"   => "",
                 "skillsmask" => 0,
