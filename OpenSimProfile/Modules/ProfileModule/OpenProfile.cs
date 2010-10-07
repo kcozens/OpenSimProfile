@@ -631,10 +631,10 @@ namespace OpenSimProfile.Modules.OpenProfile
                 UUID firstLifeImage = UUID.Zero;
                 UUID partner = UUID.Zero;
                 uint   wantMask = 0;
-                string wantText = "";
+                string wantText = String.Empty;
                 uint   skillsMask = 0;
-                string skillsText = "";
-                string languages = "";
+                string skillsText = String.Empty;
+                string languages = String.Empty;
 
                 if (profileData["ProfileUrl"] != null)
                     profileUrl = profileData["ProfileUrl"].ToString();
@@ -687,13 +687,23 @@ namespace OpenSimProfile.Modules.OpenProfile
             // if it's the profile of the user requesting the update, then we change only a few things.
             if (remoteClient.AgentId == newProfile.ID)
             {
-                string image = newProfile.Image.ToString();
-                string firstLifeImage = newProfile.FirstLifeImage.ToString();
-                string aboutText = newProfile.AboutText;
-                string firstLifeAboutText = newProfile.FirstLifeAboutText;
-                string profileUrl = newProfile.ProfileUrl;
+                Hashtable ReqHash = new Hashtable();
 
-                // TODO: Write the above to the server!!!!!
+                ReqHash["avatar_id"] = remoteClient.AgentId.ToString();
+                ReqHash["ProfileUrl"] = newProfile.ProfileUrl;
+                ReqHash["Image"] = newProfile.Image.ToString();
+                ReqHash["AboutText"] = newProfile.AboutText;
+                ReqHash["FirstLifeImage"] = newProfile.FirstLifeImage.ToString();
+                ReqHash["FirstLifeAboutText"] = newProfile.FirstLifeAboutText;
+
+                Hashtable result = GenericXMLRPCRequest(ReqHash,
+                        "avatar_properties_update");
+
+                if (!Convert.ToBoolean(result["success"]))
+                {
+                    remoteClient.SendAgentAlertMessage(
+                            result["errorMessage"].ToString(), false);
+                }
 
                 RequestAvatarProperties(remoteClient, newProfile.ID);
             }

@@ -514,6 +514,37 @@ function avatar_properties_request($method_name, $params, $app_data)
     print $response_xml;
 }
 
+xmlrpc_server_register_method($xmlrpc_server, "avatar_properties_update",
+        "avatar_properties_update");
+
+function avatar_properties_update($method_name, $params, $app_data)
+{
+    $req            = $params[0];
+
+    $uuid           = $req['avatar_id'];
+    $profileURL     = $req['ProfileUrl'];
+    $image          = $req['Image'];
+    $abouttext      = $req['AboutText'];
+    $firstlifeimage = $req['FirstLifeImage'];
+    $firstlifetext  = $req['FirstLifeAboutText'];
+
+    $result=mysql_query("UPDATE userprofile SET ".
+            "profileURL='". mysql_escape_string($profileURL) ."', ".
+            "profileImage='". mysql_escape_string($image) ."', ".
+            "profileAboutText='". mysql_escape_string($abouttext) ."', ".
+            "profileFirstImage='". mysql_escape_string($firstlifeimage) ."', ".
+            "profileFirstText='". mysql_escape_string($firstlifetext) ."' ".
+            "WHERE useruuid='". mysql_escape_string($uuid) ."'"
+        );
+
+    $response_xml = xmlrpc_encode(array(
+        'success' => $result,
+        'errorMessage' => mysql_error()
+    ));
+
+    print $response_xml;
+}
+
 
 // Profile Interests
 
