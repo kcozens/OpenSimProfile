@@ -377,8 +377,8 @@ function avatarnotesrequest($method_name, $params, $app_data)
 {
     $req            = $params[0];
 
-    $uuid           = $req['uuid'];
-    $targetuuid     = $req['avatar_id'];
+    $uuid           = $req['avatar_id'];
+    $targetuuid     = $req['uuid'];
 
     $result = mysql_query("SELECT notes FROM usernotes WHERE ".
             "useruuid = '". mysql_escape_string($uuid) ."' AND ".
@@ -448,7 +448,8 @@ function avatar_notes_update($method_name, $params, $app_data)
     }
 
     $response_xml = xmlrpc_encode(array(
-        'success' => True
+        'success' => $result,
+        'errorMessage' => mysql_error()
     ));
 
     print $response_xml;

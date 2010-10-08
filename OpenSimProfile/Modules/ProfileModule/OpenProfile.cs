@@ -227,8 +227,7 @@ namespace OpenSimProfile.Modules.OpenProfile
                 classifieds[new UUID(d["classifiedid"].ToString())] = d["name"].ToString();
             }
 
-            remoteClient.SendAvatarClassifiedReply(remoteClient.AgentId,
-                        classifieds);
+            remoteClient.SendAvatarClassifiedReply(new UUID(args[0]), classifieds);
         }
 
         // Classifieds Update
@@ -331,8 +330,7 @@ namespace OpenSimProfile.Modules.OpenProfile
                 }
             }
 
-            remoteClient.SendAvatarPicksReply(remoteClient.AgentId,
-                        picks);
+            remoteClient.SendAvatarPicksReply(new UUID(args[0]), picks);
         }
 
         // Picks Request
@@ -486,9 +484,7 @@ namespace OpenSimProfile.Modules.OpenProfile
                     notes = d["notes"].ToString();
             }
 
-            remoteClient.SendAvatarNotesReply(
-                            new UUID(ReqHash["uuid"].ToString()),
-                            notes);
+            remoteClient.SendAvatarNotesReply(new UUID(args[0]), notes);
         }
 
         // Notes Update
