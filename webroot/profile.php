@@ -227,7 +227,7 @@ function pickinforequest($method_name, $params, $app_data)
             "pickuuid = '". mysql_escape_string($pick) ."'");
 
     $row = mysql_fetch_assoc($result);
-    if ($row != FALSE)
+    if ($row != False)
     {
         if ($row["description"] == null || $row["description"] == "")
             $row["description"] = "No description given";
@@ -327,7 +327,7 @@ function picks_update($method_name, $params, $app_data)
     }
 
     $result = mysql_query($query);
-    if ($result != FALSE)
+    if ($result != False)
         $result = True;
 
     $response_xml = xmlrpc_encode(array(
@@ -352,7 +352,7 @@ function picks_delete($method_name, $params, $app_data)
     $result = mysql_query("DELETE FROM userpicks WHERE ".
             "pickuuid = '".mysql_escape_string($pickuuid) ."'");
 
-    if ($result != FALSE)
+    if ($result != False)
         $result = True;
 
     $response_xml = xmlrpc_encode(array(
@@ -385,7 +385,7 @@ function avatarnotesrequest($method_name, $params, $app_data)
             "targetuuid = '". mysql_escape_string($targetuuid) ."'");
 
     $row = mysql_fetch_row($result);
-    if ($row == FALSE)
+    if ($row == False)
         $notes = "";
     else
         $notes = $row[0];
@@ -471,7 +471,7 @@ function avatar_properties_request($method_name, $params, $app_data)
             "useruuid = '". mysql_escape_string($uuid) ."'");
     $row = mysql_fetch_assoc($result);
 
-    if ($row != FALSE)
+    if ($row != False)
     {
         $data[] = array(
                 "ProfileUrl" => $row["profileURL"],
@@ -599,12 +599,28 @@ function user_preferences_request($method_name, $params, $app_data)
     $result = mysql_query("SELECT imviaemail,visible,email FROM usersettings WHERE ".
             "useruuid = '". mysql_escape_string($uuid) ."'");
 
-    while (($row = mysql_fetch_assoc($result)))
+    $row = mysql_fetch_assoc($result);
+
+    if ($row != False)
     {
         $data[] = array(
                 "imviaemail" => $row["imviaemail"],
                 "visible" => $row["visible"],
                 "email" => $row["email"]);
+    }
+    else
+    {
+        //Insert empty record for avatar.
+        //NOTE: The 'false' values here are enums defined in database
+        $sql = "INSERT INTO usersettings VALUES ".
+                "('". mysql_escape_string($uuid) ."', ".
+                "'false', 'false', '')";
+        $result = mysql_query($sql);
+
+        $data[] = array(
+                "imviaemail" => False,
+                "visible" => False,
+                "email" => "");
     }
 
     $response_xml = xmlrpc_encode(array(

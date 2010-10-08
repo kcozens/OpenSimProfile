@@ -554,11 +554,15 @@ namespace OpenSimProfile.Modules.OpenProfile
             if (dataArray != null && dataArray[0] != null)
             {
                 Hashtable d = (Hashtable)dataArray[0];
+                string mail = "";
+
+                if (d["email"] != null)
+                    mail = d["email"].ToString();
 
                 remoteClient.SendUserInfoReply(
                         Convert.ToBoolean(d["imviaemail"]),
                         Convert.ToBoolean(d["visible"]),
-                        d["email"].ToString());
+                        mail);
             }
         }
 
