@@ -626,7 +626,7 @@ namespace OpenSimProfile.Modules.OpenProfile
                     charterMember = Utils.StringToBytes(account.UserTitle);
                 }
 
-                Hashtable profileData = GetProfileData(remoteClient.AgentId);
+                Hashtable profileData = GetProfileData(avatarID);
                 string profileUrl = String.Empty;
                 string aboutText = String.Empty;
                 string firstLifeAboutText = String.Empty;
