@@ -452,6 +452,7 @@ namespace OpenSimProfile.Modules.OpenProfile
 
         public void HandleAvatarNotesRequest(Object sender, string method, List<String> args)
         {
+            string targetid;
             string notes = "";
 
             if (!(sender is IClientAPI))
@@ -480,11 +481,12 @@ namespace OpenSimProfile.Modules.OpenProfile
             {
                 Hashtable d = (Hashtable)dataArray[0];
 
+                targetid = d["targetid"].ToString();
                 if (d["notes"] != null)
                     notes = d["notes"].ToString();
-            }
 
-            remoteClient.SendAvatarNotesReply(new UUID(args[0]), notes);
+                remoteClient.SendAvatarNotesReply(new UUID(targetid), notes);
+            }
         }
 
         // Notes Update
