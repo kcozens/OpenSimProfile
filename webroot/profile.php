@@ -39,7 +39,7 @@ function avatarclassifiedsrequest($method_name, $params, $app_data)
 
 
     $result = mysql_query("SELECT * FROM classifieds WHERE ".
-            "creatoruuid = '". mysql_escape_string($uuid) ."'");
+            "creatoruuid = '". mysql_real_escape_string($uuid) ."'");
 
     $data = array();
 
@@ -85,7 +85,7 @@ function classified_update($method_name, $params, $app_data)
 
     // Check if we already have this one in the database
     $check = mysql_query("SELECT COUNT(*) FROM classifieds WHERE ".
-            "classifieduuid = '". mysql_escape_string($classifieduuid) ."'");
+            "classifieduuid = '". mysql_real_escape_string($classifieduuid) ."'");
 
     while ($row = mysql_fetch_row($check))
     {
@@ -119,21 +119,21 @@ function classified_update($method_name, $params, $app_data)
         }
 
         $insertquery = "INSERT INTO classifieds VALUES ".
-            "('". mysql_escape_string($classifieduuid) ."',".
-            "'". mysql_escape_string($creator) ."',".
-            "". mysql_escape_string($creationdate) .",".
-            "". mysql_escape_string($expirationdate) .",".
-            "'". mysql_escape_string($category) ."',".
-            "'". mysql_escape_string($name) ."',".
-            "'". mysql_escape_string($description) ."',".
-            "'". mysql_escape_string($parceluuid) ."',".
-            "". mysql_escape_string($parentestate) .",".
-            "'". mysql_escape_string($snapshotuuid) ."',".
-            "'". mysql_escape_string($simname) ."',".
-            "'". mysql_escape_string($globalpos) ."',".
-            "'". mysql_escape_string($parcelname) ."',".
-            "". mysql_escape_string($classifiedflag) .",".
-            "". mysql_escape_string($priceforlist) .")";
+            "('". mysql_real_escape_string($classifieduuid) ."',".
+            "'". mysql_real_escape_string($creator) ."',".
+            "". mysql_real_escape_string($creationdate) .",".
+            "". mysql_real_escape_string($expirationdate) .",".
+            "'". mysql_real_escape_string($category) ."',".
+            "'". mysql_real_escape_string($name) ."',".
+            "'". mysql_real_escape_string($description) ."',".
+            "'". mysql_real_escape_string($parceluuid) ."',".
+            "". mysql_real_escape_string($parentestate) .",".
+            "'". mysql_real_escape_string($snapshotuuid) ."',".
+            "'". mysql_real_escape_string($simname) ."',".
+            "'". mysql_real_escape_string($globalpos) ."',".
+            "'". mysql_real_escape_string($parcelname) ."',".
+            "". mysql_real_escape_string($classifiedflag) .",".
+            "". mysql_real_escape_string($priceforlist) .")";
 
         // Create a new record for this classified
         $result = mysql_query($insertquery);
@@ -163,7 +163,7 @@ function classified_delete($method_name, $params, $app_data)
     $classifieduuid = $req['classifiedID'];
 
     $result = mysql_query("DELETE FROM classifieds WHERE ".
-            "classifieduuid = '".mysql_escape_string($classifieduuid) ."'");
+            "classifieduuid = '".mysql_real_escape_string($classifieduuid) ."'");
 
     $response_xml = xmlrpc_encode(array(
         'success' => True,
@@ -191,7 +191,7 @@ function avatarpicksrequest($method_name, $params, $app_data)
     $data = array();
 
     $result = mysql_query("SELECT `pickuuid`,`name` FROM userpicks WHERE ".
-            "creatoruuid = '". mysql_escape_string($uuid) ."'");
+            "creatoruuid = '". mysql_real_escape_string($uuid) ."'");
 
     while (($row = mysql_fetch_assoc($result)))
     {
@@ -223,8 +223,8 @@ function pickinforequest($method_name, $params, $app_data)
     $data = array();
 
     $result = mysql_query("SELECT * FROM userpicks WHERE ".
-            "creatoruuid = '". mysql_escape_string($uuid) ."' AND ".
-            "pickuuid = '". mysql_escape_string($pick) ."'");
+            "creatoruuid = '". mysql_real_escape_string($uuid) ."' AND ".
+            "pickuuid = '". mysql_real_escape_string($pick) ."'");
 
     $row = mysql_fetch_assoc($result);
     if ($row != False)
@@ -288,7 +288,7 @@ function picks_update($method_name, $params, $app_data)
 
     // Check if we already have this one in the database
     $check = mysql_query("SELECT COUNT(*) FROM userpicks WHERE ".
-            "pickuuid = '". mysql_escape_string($pickuuid) ."'");
+            "pickuuid = '". mysql_real_escape_string($pickuuid) ."'");
 
     $row = mysql_fetch_row($check);
 
@@ -302,28 +302,28 @@ function picks_update($method_name, $params, $app_data)
         $original = $name;
 
         $query = "INSERT INTO userpicks VALUES ".
-            "('". mysql_escape_string($pickuuid) ."',".
-            "'". mysql_escape_string($creator) ."',".
-            "'". mysql_escape_string($toppick) ."',".
-            "'". mysql_escape_string($parceluuid) ."',".
-            "'". mysql_escape_string($name) ."',".
-            "'". mysql_escape_string($description) ."',".
-            "'". mysql_escape_string($snapshotuuid) ."',".
-            "'". mysql_escape_string($user) ."',".
-            "'". mysql_escape_string($original) ."',".
-            "'". mysql_escape_string($simname) ."',".
-            "'". mysql_escape_string($posglobal) ."',".
-            "'". mysql_escape_string($sortorder) ."',".
-            "'". mysql_escape_string($enabled) ."')";
+            "('". mysql_real_escape_string($pickuuid) ."',".
+            "'". mysql_real_escape_string($creator) ."',".
+            "'". mysql_real_escape_string($toppick) ."',".
+            "'". mysql_real_escape_string($parceluuid) ."',".
+            "'". mysql_real_escape_string($name) ."',".
+            "'". mysql_real_escape_string($description) ."',".
+            "'". mysql_real_escape_string($snapshotuuid) ."',".
+            "'". mysql_real_escape_string($user) ."',".
+            "'". mysql_real_escape_string($original) ."',".
+            "'". mysql_real_escape_string($simname) ."',".
+            "'". mysql_real_escape_string($posglobal) ."',".
+            "'". mysql_real_escape_string($sortorder) ."',".
+            "'". mysql_real_escape_string($enabled) ."')";
     }
     else
     {
         $query = "UPDATE userpicks SET " .
-            "parceluuid = '". mysql_escape_string($parceluuid) . "', " .
-            "name = '". mysql_escape_string($name) . "', " .
-            "description = '". mysql_escape_string($description) . "', " .
-            "snapshotuuid = '". mysql_escape_string($snapshotuuid) . "' WHERE ".
-            "pickuuid = '". mysql_escape_string($pickuuid) ."'";
+            "parceluuid = '". mysql_real_escape_string($parceluuid) . "', " .
+            "name = '". mysql_real_escape_string($name) . "', " .
+            "description = '". mysql_real_escape_string($description) . "', " .
+            "snapshotuuid = '". mysql_real_escape_string($snapshotuuid) . "' WHERE ".
+            "pickuuid = '". mysql_real_escape_string($pickuuid) ."'";
     }
 
     $result = mysql_query($query);
@@ -350,7 +350,7 @@ function picks_delete($method_name, $params, $app_data)
     $pickuuid       = $req['pick_id'];
 
     $result = mysql_query("DELETE FROM userpicks WHERE ".
-            "pickuuid = '".mysql_escape_string($pickuuid) ."'");
+            "pickuuid = '".mysql_real_escape_string($pickuuid) ."'");
 
     if ($result != False)
         $result = True;
@@ -381,8 +381,8 @@ function avatarnotesrequest($method_name, $params, $app_data)
     $targetuuid     = $req['uuid'];
 
     $result = mysql_query("SELECT notes FROM usernotes WHERE ".
-            "useruuid = '". mysql_escape_string($uuid) ."' AND ".
-            "targetuuid = '". mysql_escape_string($targetuuid) ."'");
+            "useruuid = '". mysql_real_escape_string($uuid) ."' AND ".
+            "targetuuid = '". mysql_real_escape_string($targetuuid) ."'");
 
     $row = mysql_fetch_row($result);
     if ($row == False)
@@ -418,8 +418,8 @@ function avatar_notes_update($method_name, $params, $app_data)
     // Check if we already have this one in the database
 
     $check = mysql_query("SELECT COUNT(*) FROM usernotes WHERE ".
-            "useruuid = '". mysql_escape_string($uuid) ."' AND ".
-            "targetuuid = '". mysql_escape_string($targetuuid) ."'");
+            "useruuid = '". mysql_real_escape_string($uuid) ."' AND ".
+            "targetuuid = '". mysql_real_escape_string($targetuuid) ."'");
 
     $row = mysql_fetch_row($check);
 
@@ -427,24 +427,24 @@ function avatar_notes_update($method_name, $params, $app_data)
     {
         // Create a new record for this avatar note
         $result = mysql_query("INSERT INTO usernotes VALUES ".
-            "('". mysql_escape_string($uuid) ."',".
-            "'". mysql_escape_string($targetuuid) ."',".
-            "'". mysql_escape_string($notes) ."')");
+            "('". mysql_real_escape_string($uuid) ."',".
+            "'". mysql_real_escape_string($targetuuid) ."',".
+            "'". mysql_real_escape_string($notes) ."')");
     }
     else if ($notes == "")
     {
         // Delete the record for this avatar note
         $result = mysql_query("DELETE FROM usernotes WHERE ".
-            "useruuid = '". mysql_escape_string($uuid) ."' AND ".
-            "targetuuid = '". mysql_escape_string($targetuuid) ."'");
+            "useruuid = '". mysql_real_escape_string($uuid) ."' AND ".
+            "targetuuid = '". mysql_real_escape_string($targetuuid) ."'");
     }
     else
     {
         // Update the existing record
         $result = mysql_query("UPDATE usernotes SET ".
-            "notes = '". mysql_escape_string($notes) ."' WHERE ".
-            "useruuid = '". mysql_escape_string($uuid) ."' AND ".
-            "targetuuid = '". mysql_escape_string($targetuuid) ."'");
+            "notes = '". mysql_real_escape_string($notes) ."' WHERE ".
+            "useruuid = '". mysql_real_escape_string($uuid) ."' AND ".
+            "targetuuid = '". mysql_real_escape_string($targetuuid) ."'");
     }
 
     $response_xml = xmlrpc_encode(array(
@@ -469,7 +469,7 @@ function avatar_properties_request($method_name, $params, $app_data)
     $uuid           = $req['avatar_id'];
 
     $result = mysql_query("SELECT * FROM userprofile WHERE ".
-            "useruuid = '". mysql_escape_string($uuid) ."'");
+            "useruuid = '". mysql_real_escape_string($uuid) ."'");
     $row = mysql_fetch_assoc($result);
 
     if ($row != False)
@@ -494,7 +494,7 @@ function avatar_properties_request($method_name, $params, $app_data)
         //Insert empty record for avatar.
         //FIXME: Should this only be done when asking for ones own profile?
         $sql = "INSERT INTO userprofile VALUES ( ".
-                "'". mysql_escape_string($uuid) ."', ".
+                "'". mysql_real_escape_string($uuid) ."', ".
                 "'$zeroUUID', 0, 0, '', 0, '', 0, '', '', ".
                 "'$zeroUUID', '', '$zeroUUID', '')";
         $result = mysql_query($sql);
@@ -537,12 +537,12 @@ function avatar_properties_update($method_name, $params, $app_data)
     $firstlifetext  = $req['FirstLifeAboutText'];
 
     $result=mysql_query("UPDATE userprofile SET ".
-            "profileURL='". mysql_escape_string($profileURL) ."', ".
-            "profileImage='". mysql_escape_string($image) ."', ".
-            "profileAboutText='". mysql_escape_string($abouttext) ."', ".
-            "profileFirstImage='". mysql_escape_string($firstlifeimage) ."', ".
-            "profileFirstText='". mysql_escape_string($firstlifetext) ."' ".
-            "WHERE useruuid='". mysql_escape_string($uuid) ."'"
+            "profileURL='". mysql_real_escape_string($profileURL) ."', ".
+            "profileImage='". mysql_real_escape_string($image) ."', ".
+            "profileAboutText='". mysql_real_escape_string($abouttext) ."', ".
+            "profileFirstImage='". mysql_real_escape_string($firstlifeimage) ."', ".
+            "profileFirstText='". mysql_real_escape_string($firstlifetext) ."' ".
+            "WHERE useruuid='". mysql_real_escape_string($uuid) ."'"
         );
 
     $response_xml = xmlrpc_encode(array(
@@ -571,12 +571,12 @@ function avatar_interests_update($method_name, $params, $app_data)
     $languages      = $req['languages'];
 
     $result = mysql_query("UPDATE userprofile SET ".
-            "profileWantToMask = ". mysql_escape_string($wantmask) .",".
-            "profileWantToText = '". mysql_escape_string($wanttext) ."',".
-            "profileSkillsMask = ". mysql_escape_string($skillsmask) .",".
-            "profileSkillsText = '". mysql_escape_string($skillstext) ."',".
-            "profileLanguages = '". mysql_escape_string($languages) ."' ".
-            "WHERE useruuid = '". mysql_escape_string($uuid) ."'"
+            "profileWantToMask = ". mysql_real_escape_string($wantmask) .",".
+            "profileWantToText = '". mysql_real_escape_string($wanttext) ."',".
+            "profileSkillsMask = ". mysql_real_escape_string($skillsmask) .",".
+            "profileSkillsText = '". mysql_real_escape_string($skillstext) ."',".
+            "profileLanguages = '". mysql_real_escape_string($languages) ."' ".
+            "WHERE useruuid = '". mysql_real_escape_string($uuid) ."'"
         );
 
     $response_xml = xmlrpc_encode(array(
@@ -598,7 +598,7 @@ function user_preferences_request($method_name, $params, $app_data)
     $uuid           = $req['avatar_id'];
 
     $result = mysql_query("SELECT imviaemail,visible,email FROM usersettings WHERE ".
-            "useruuid = '". mysql_escape_string($uuid) ."'");
+            "useruuid = '". mysql_real_escape_string($uuid) ."'");
 
     $row = mysql_fetch_assoc($result);
 
@@ -614,7 +614,7 @@ function user_preferences_request($method_name, $params, $app_data)
         //Insert empty record for avatar.
         //NOTE: The 'false' values here are enums defined in database
         $sql = "INSERT INTO usersettings VALUES ".
-                "('". mysql_escape_string($uuid) ."', ".
+                "('". mysql_real_escape_string($uuid) ."', ".
                 "'false', 'false', '')";
         $result = mysql_query($sql);
 
@@ -645,9 +645,9 @@ function user_preferences_update($method_name, $params, $app_data)
     $directory      = $req['visible'];
 
     $result = mysql_query("UPDATE usersettings SET ".
-            "imviaemail = '".mysql_escape_string($wantim) ."', ".
-            "visible = '".mysql_escape_string($directory) ."' WHERE ".
-            "useruuid = '". mysql_escape_string($uuid) ."'");
+            "imviaemail = '".mysql_real_escape_string($wantim) ."', ".
+            "visible = '".mysql_real_escape_string($directory) ."' WHERE ".
+            "useruuid = '". mysql_real_escape_string($uuid) ."'");
 
     $response_xml = xmlrpc_encode(array(
         'success' => True,
