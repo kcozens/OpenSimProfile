@@ -14,10 +14,15 @@ using OpenSim.Framework;
 using OpenSim.Region.Framework.Interfaces;
 using OpenSim.Region.Framework.Scenes;
 using OpenSim.Services.Interfaces;
+using Mono.Addins;
+
+[assembly: Addin("OpenProfileModule", "0.1")]
+[assembly: AddinDependency("OpenSim", "0.5")]
 
 namespace OpenSimProfile.Modules.OpenProfile
 {
-    public class OpenProfileModule : IRegionModule
+    [Extension(Path = "/OpenSim/RegionModules", NodeName = "RegionModule")]
+    public class OpenProfileModule : IProfileModule, ISharedRegionModule
     {
         //
         // Log module
@@ -32,46 +37,66 @@ namespace OpenSimProfile.Modules.OpenProfile
         private string m_ProfileServer = "";
         private bool m_Enabled = true;
 
-        public void Initialise(Scene scene, IConfigSource config)
+        public void Initialise(IConfigSource config)
+        {
+            IConfig profileConfig = config.Configs["Profile"];
+
+            if (profileConfig == null)
+            {
+                m_Enabled = false;
+                return;
+            }
+            m_ProfileServer = profileConfig.GetString("ProfileURL", "");
+            if (m_ProfileServer == "")
+            {
+                m_Enabled = false;
+                return;
+            }
+            else
+            {
+                m_log.Info("[PROFILE] OpenProfile module is activated");
+                m_Enabled = true;
+            }
+        }
+
+        public void AddRegion(Scene scene)
         {
             if (!m_Enabled)
                 return;
 
-            IConfig profileConfig = config.Configs["Profile"];
-
-            if (m_Scenes.Count == 0) // First time
-            {
-                if (profileConfig == null)
-                {
-                    m_Enabled = false;
-                    return;
-                }
-                m_ProfileServer = profileConfig.GetString("ProfileURL", "");
-                if (m_ProfileServer == "")
-                {
-                    m_Enabled = false;
-                    return;
-                }
-                else
-                {
-                    m_log.Info("[PROFILE] OpenProfile module is activated");
-                    m_Enabled = true;
-                }
-            }
-
-            if (!m_Scenes.Contains(scene))
-                m_Scenes.Add(scene);
-
-            m_gConfig = config;
-
             // Hook up events
             scene.EventManager.OnNewClient += OnNewClient;
+
+            // Take ownership of the IProfileModule service
+            scene.RegisterModuleInterface<IProfileModule>(this);
+
+            // Add our scene to our list...
+            lock(m_Scenes)
+            {
+                m_Scenes.Add(scene);
+            }
+        }
+
+        public void RemoveRegion(Scene scene)
+        {
+            if (!m_Enabled)
+                return;
+
+            scene.UnregisterModuleInterface<IProfileModule>(this);
+            m_Scenes.Remove(scene);
+        }
+
+        public void RegionLoaded(Scene scene)
+        {
+        }
+
+        public Type ReplaceableInterface
+        {
+            get { return null; }
         }
 
         public void PostInitialise()
         {
-            if (!m_Enabled)
-                return;
         }
 
         public void Close()

@@ -36,4 +36,4 @@
      <Files>
        <Match pattern="*.cs" recurse="true"/>
      </Files>
-   </Project>
+</Project>
