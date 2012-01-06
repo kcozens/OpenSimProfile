@@ -32,14 +32,28 @@ namespace OpenSimProfile.Modules.OpenProfile
         //
         // Module vars
         //
-        private IConfigSource m_gConfig;
+        private IConfigSource m_Config;
         private List<Scene> m_Scenes = new List<Scene>();
         private string m_ProfileServer = "";
         private bool m_Enabled = true;
 
-        public void Initialise(IConfigSource config)
+        IUserManagement m_uMan;
+        IUserManagement UserManagementModule
         {
-            IConfig profileConfig = config.Configs["Profile"];
+            get
+            {
+                if (m_uMan == null)
+                    m_uMan = m_Scenes[0].RequestModuleInterface<IUserManagement>();
+                return m_uMan;
+            }
+        }
+
+        #region IRegionModuleBase implementation
+        public void Initialise(IConfigSource source)
+        {
+            m_Config = source;
+
+            IConfig profileConfig = m_Config.Configs["Profile"];
 
             if (profileConfig == null)
             {
@@ -107,13 +121,9 @@ namespace OpenSimProfile.Modules.OpenProfile
         {
             get { return "ProfileModule"; }
         }
+        #endregion
 
-        public bool IsSharedModule
-        {
-            get { return true; }
-        }
-
-        ScenePresence FindPresence(UUID clientID)
+        private ScenePresence FindPresence(UUID clientID)
         {
             ScenePresence p;
 
@@ -157,7 +167,7 @@ namespace OpenSimProfile.Modules.OpenProfile
         //
         // Make external XMLRPC request
         //
-        private Hashtable GenericXMLRPCRequest(Hashtable ReqParams, string method)
+        private Hashtable GenericXMLRPCRequest(Hashtable ReqParams, string method, string server)
         {
             ArrayList SendParams = new ArrayList();
             SendParams.Add(ReqParams);
@@ -167,7 +177,10 @@ namespace OpenSimProfile.Modules.OpenProfile
             try
             {
                 XmlRpcRequest Req = new XmlRpcRequest(method, SendParams);
-                Resp = Req.Send(m_ProfileServer, 30000);
+                // HG Change!
+                // Will need to know the server: Pass it in the ReqParams???
+                // Resp = Req.Send(m_ProfileServer, 30000);
+                Resp = Req.Send(server, 30000);
             }
             catch (WebException ex)
             {
@@ -220,7 +233,6 @@ namespace OpenSimProfile.Modules.OpenProfile
         }
 
         // Classifieds Handler
-
         public void HandleAvatarClassifiedsRequest(Object sender, string method, List<String> args)
         {
             if (!(sender is IClientAPI))
@@ -228,11 +240,17 @@ namespace OpenSimProfile.Modules.OpenProfile
 
             IClientAPI remoteClient = (IClientAPI)sender;
 
+            UUID targetID;
+            UUID.TryParse(args[0], out targetID);
+
+            string serverURI = string.Empty;
+            bool foreign = GetUserProfileServerURI(targetID, out serverURI);
+
             Hashtable ReqHash = new Hashtable();
             ReqHash["uuid"] = args[0];
 
             Hashtable result = GenericXMLRPCRequest(ReqHash,
-                    method);
+                    method, serverURI);
 
             if (!Convert.ToBoolean(result["success"]))
             {
@@ -256,7 +274,6 @@ namespace OpenSimProfile.Modules.OpenProfile
         }
 
         // Classifieds Update
-
         public void ClassifiedInfoUpdate(UUID queryclassifiedID, uint queryCategory, string queryName, string queryDescription, UUID queryParcelID,
                                         uint queryParentEstate, UUID querySnapshotID, Vector3 queryGlobalPos, byte queryclassifiedFlags,
                                         int queryclassifiedPrice, IClientAPI remoteClient)
@@ -277,14 +294,16 @@ namespace OpenSimProfile.Modules.OpenProfile
 
             ScenePresence p = FindPresence(remoteClient.AgentId);
 
+
+            string serverURI = string.Empty;
+            bool foreign = GetUserProfileServerURI(remoteClient.AgentId, out serverURI);
+
             Vector3 avaPos = p.AbsolutePosition;
 
             // Getting the parceluuid for this parcel
-
             ReqHash["parcel_uuid"] = p.currentParcelUUID.ToString();
 
             // Getting the global position for the Avatar
-
             Vector3 posGlobal = new Vector3(remoteClient.Scene.RegionInfo.RegionLocX * Constants.RegionSize + avaPos.X,
                                             remoteClient.Scene.RegionInfo.RegionLocY * Constants.RegionSize + avaPos.Y,
                                             avaPos.Z);
@@ -292,7 +311,7 @@ namespace OpenSimProfile.Modules.OpenProfile
             ReqHash["pos_global"] = posGlobal.ToString();
 
             Hashtable result = GenericXMLRPCRequest(ReqHash,
-                    "classified_update");
+                    "classified_update", serverURI);
 
             if (!Convert.ToBoolean(result["success"]))
             {
@@ -302,15 +321,18 @@ namespace OpenSimProfile.Modules.OpenProfile
         }
 
         // Classifieds Delete
-
         public void ClassifiedDelete (UUID queryClassifiedID, IClientAPI remoteClient)
         {
             Hashtable ReqHash = new Hashtable();
 
+
+            string serverURI = string.Empty;
+            bool foreign = GetUserProfileServerURI(remoteClient.AgentId, out serverURI);
+
             ReqHash["classifiedID"] = queryClassifiedID.ToString();
 
             Hashtable result = GenericXMLRPCRequest(ReqHash,
-                    "classified_delete");
+                    "classified_delete", serverURI);
 
             if (!Convert.ToBoolean(result["success"]))
             {
@@ -320,7 +342,6 @@ namespace OpenSimProfile.Modules.OpenProfile
         }
 
         // Picks Handler
-
         public void HandleAvatarPicksRequest(Object sender, string method, List<String> args)
         {
             if (!(sender is IClientAPI))
@@ -328,11 +349,17 @@ namespace OpenSimProfile.Modules.OpenProfile
 
             IClientAPI remoteClient = (IClientAPI)sender;
 
+            UUID targetID;
+            UUID.TryParse(args[0], out targetID);
+
+            string serverURI = string.Empty;
+            bool foreign = GetUserProfileServerURI(targetID, out serverURI);
+
             Hashtable ReqHash = new Hashtable();
             ReqHash["uuid"] = args[0];
 
             Hashtable result = GenericXMLRPCRequest(ReqHash,
-                    method);
+                    method, serverURI);
 
             if (!Convert.ToBoolean(result["success"]))
             {
@@ -359,7 +386,6 @@ namespace OpenSimProfile.Modules.OpenProfile
         }
 
         // Picks Request
-
         public void HandlePickInfoRequest(Object sender, string method, List<String> args)
         {
             if (!(sender is IClientAPI))
@@ -369,11 +395,17 @@ namespace OpenSimProfile.Modules.OpenProfile
 
             Hashtable ReqHash = new Hashtable();
 
+            UUID targetID;
+            UUID.TryParse(args[0], out targetID);
+
+            string serverURI = string.Empty;
+            bool foreign = GetUserProfileServerURI(targetID, out serverURI);
+
             ReqHash["avatar_id"] = args[0];
             ReqHash["pick_id"] = args[1];
 
             Hashtable result = GenericXMLRPCRequest(ReqHash,
-                    method);
+                    method, serverURI);
 
             if (!Convert.ToBoolean(result["success"]))
             {
@@ -409,7 +441,6 @@ namespace OpenSimProfile.Modules.OpenProfile
         }
 
         // Picks Update
-
         public void PickInfoUpdate(IClientAPI remoteClient, UUID pickID, UUID creatorID, bool topPick, string name, string desc, UUID snapshotID, int sortOrder, bool enabled)
         {
             Hashtable ReqHash = new Hashtable();
@@ -430,11 +461,9 @@ namespace OpenSimProfile.Modules.OpenProfile
             Vector3 avaPos = p.AbsolutePosition;
 
             // Getting the parceluuid for this parcel
-
             ReqHash["parcel_uuid"] = p.currentParcelUUID.ToString();
 
             // Getting the global position for the Avatar
-
             Vector3 posGlobal = new Vector3(remoteClient.Scene.RegionInfo.RegionLocX*Constants.RegionSize + avaPos.X,
                                             remoteClient.Scene.RegionInfo.RegionLocY*Constants.RegionSize + avaPos.Y,
                                             avaPos.Z);
@@ -444,9 +473,12 @@ namespace OpenSimProfile.Modules.OpenProfile
             // Getting the owner of the parcel
             ReqHash["user"] = "";   //FIXME: Get avatar/group who owns parcel
 
+            string serverURI = string.Empty;
+            bool foreign = GetUserProfileServerURI(remoteClient.AgentId, out serverURI);
+
             // Do the request
             Hashtable result = GenericXMLRPCRequest(ReqHash,
-                    "picks_update");
+                    "picks_update", serverURI);
 
             if (!Convert.ToBoolean(result["success"]))
             {
@@ -456,15 +488,17 @@ namespace OpenSimProfile.Modules.OpenProfile
         }
 
         // Picks Delete
-
         public void PickDelete(IClientAPI remoteClient, UUID queryPickID)
         {
             Hashtable ReqHash = new Hashtable();
 
             ReqHash["pick_id"] = queryPickID.ToString();
 
+            string serverURI = string.Empty;
+            bool foreign = GetUserProfileServerURI(remoteClient.AgentId, out serverURI);
+
             Hashtable result = GenericXMLRPCRequest(ReqHash,
-                    "picks_delete");
+                    "picks_delete", serverURI);
 
             if (!Convert.ToBoolean(result["success"]))
             {
@@ -474,7 +508,6 @@ namespace OpenSimProfile.Modules.OpenProfile
         }
 
         // Notes Handler
-
         public void HandleAvatarNotesRequest(Object sender, string method, List<String> args)
         {
             string targetid;
@@ -490,8 +523,11 @@ namespace OpenSimProfile.Modules.OpenProfile
             ReqHash["avatar_id"] = remoteClient.AgentId.ToString();
             ReqHash["uuid"] = args[0];
 
+            string serverURI = string.Empty;
+            bool foreign = GetUserProfileServerURI(remoteClient.AgentId, out serverURI);
+
             Hashtable result = GenericXMLRPCRequest(ReqHash,
-                    method);
+                    method, serverURI);
 
             if (!Convert.ToBoolean(result["success"]))
             {
@@ -515,7 +551,6 @@ namespace OpenSimProfile.Modules.OpenProfile
         }
 
         // Notes Update
-
         public void AvatarNotesUpdate(IClientAPI remoteClient, UUID queryTargetID, string queryNotes)
         {
             Hashtable ReqHash = new Hashtable();
@@ -524,8 +559,11 @@ namespace OpenSimProfile.Modules.OpenProfile
             ReqHash["target_id"] = queryTargetID.ToString();
             ReqHash["notes"] = queryNotes;
 
+            string serverURI = string.Empty;
+            bool foreign = GetUserProfileServerURI(remoteClient.AgentId, out serverURI);
+
             Hashtable result = GenericXMLRPCRequest(ReqHash,
-                    "avatar_notes_update");
+                    "avatar_notes_update", serverURI);
 
             if (!Convert.ToBoolean(result["success"]))
             {
@@ -546,8 +584,11 @@ namespace OpenSimProfile.Modules.OpenProfile
             ReqHash["skillstext"] = skillstext;
             ReqHash["languages"] = languages;
 
+            string serverURI = string.Empty;
+            bool foreign = GetUserProfileServerURI(remoteClient.AgentId, out serverURI);
+
             Hashtable result = GenericXMLRPCRequest(ReqHash,
-                    "avatar_interests_update");
+                    "avatar_interests_update", serverURI);
 
             if (!Convert.ToBoolean(result["success"]))
             {
@@ -562,8 +603,11 @@ namespace OpenSimProfile.Modules.OpenProfile
 
             ReqHash["avatar_id"] = remoteClient.AgentId.ToString();
 
+            string serverURI = string.Empty;
+            bool foreign = GetUserProfileServerURI(remoteClient.AgentId, out serverURI);
+
             Hashtable result = GenericXMLRPCRequest(ReqHash,
-                    "user_preferences_request");
+                    "user_preferences_request", serverURI);
 
             if (!Convert.ToBoolean(result["success"]))
             {
@@ -597,8 +641,11 @@ namespace OpenSimProfile.Modules.OpenProfile
             ReqHash["imViaEmail"] = imViaEmail.ToString();
             ReqHash["visible"] = visible.ToString();
 
+            string serverURI = string.Empty;
+            bool foreign = GetUserProfileServerURI(remoteClient.AgentId, out serverURI);
+
             Hashtable result = GenericXMLRPCRequest(ReqHash,
-                    "user_preferences_update");
+                    "user_preferences_update", serverURI);
 
             if (!Convert.ToBoolean(result["success"]))
             {
@@ -614,8 +661,11 @@ namespace OpenSimProfile.Modules.OpenProfile
 
             ReqHash["avatar_id"] = userID.ToString();
 
+            string serverURI = string.Empty;
+            bool foreign = GetUserProfileServerURI(userID, out serverURI);
+
             Hashtable result = GenericXMLRPCRequest(ReqHash,
-                    "avatar_properties_request");
+                    "avatar_properties_request", serverURI);
 
             ArrayList dataArray = (ArrayList)result["data"];
 
@@ -635,13 +685,29 @@ namespace OpenSimProfile.Modules.OpenProfile
 
             Scene scene = (Scene)s;
 
-            UserAccount account = scene.UserAccountService.GetUserAccount(scene.RegionInfo.ScopeID, avatarID);
+            string serverURI = string.Empty;
+            bool foreign = GetUserProfileServerURI(avatarID, out serverURI);
+
+            UserAccount account = null;
+            Dictionary<string,object> userInfo;
+
+            if(!foreign)
+            {
+                account = scene.UserAccountService.GetUserAccount(scene.RegionInfo.ScopeID, avatarID);
+            }
+            else
+            {
+                userInfo = new Dictionary<string, object>();
+            }
+
+            Byte[] charterMember = new Byte[1];
+            string born = String.Empty;
+            uint flags = 0x00;
+
             if (null != account)
             {
-                Byte[] charterMember;
                 if (account.UserTitle == "")
                 {
-                    charterMember = new Byte[1];
                     charterMember[0] = (Byte)((account.UserFlags & 0xf00) >> 8);
                 }
                 else
@@ -649,8 +715,36 @@ namespace OpenSimProfile.Modules.OpenProfile
                     charterMember = Utils.StringToBytes(account.UserTitle);
                 }
 
+                born = Util.ToDateTime(account.Created).ToString(
+                                  "M/d/yyyy", CultureInfo.InvariantCulture);
+                flags = (uint)(account.UserFlags & 0xff);
+
+            }
+            else
+            {
+                if (GetUserProfileData(avatarID, out userInfo) == true)
+                {
+                    if ((string)userInfo["user_title"] == "")
+                    {
+                        charterMember[0] = (Byte)(((Byte)userInfo["user_flags"] & 0xf00) >> 8);
+                    }
+                    else
+                    {
+                        charterMember = Utils.StringToBytes((string)userInfo["user_title"]);
+                    }
+
+                    int val_born = (int)userInfo["user_created"];
+                    born = Util.ToDateTime(val_born).ToString(
+                                  "M/d/yyyy", CultureInfo.InvariantCulture);
+
+                    // picky, picky
+                    int val_flags = (int)userInfo["user_flags"];
+                    flags = (uint)(val_flags & 0xff);
+                }
+            }
+
                 Hashtable profileData = GetProfileData(avatarID);
-                string profileUrl = String.Empty;
+            string profileUrl = string.Empty;
                 string aboutText = String.Empty;
                 string firstLifeAboutText = String.Empty;
                 UUID image = UUID.Zero;
@@ -678,11 +772,9 @@ namespace OpenSimProfile.Modules.OpenProfile
                 // The PROFILE information is no longer stored in the user
                 // account. It now needs to be taken from the XMLRPC
                 //
-                remoteClient.SendAvatarProperties(avatarID, aboutText,
-                          Util.ToDateTime(account.Created).ToString(
-                                  "M/d/yyyy", CultureInfo.InvariantCulture),
+            remoteClient.SendAvatarProperties(avatarID, aboutText,born,
                           charterMember, firstLifeAboutText,
-                          (uint)(account.UserFlags & 0xff),
+                      flags,
                           firstLifeImage, image, profileUrl, partner);
 
                 //Viewer expects interest data when it asks for properties.
@@ -701,11 +793,7 @@ namespace OpenSimProfile.Modules.OpenProfile
 
                 remoteClient.SendAvatarInterestsReply(avatarID, wantMask, wantText,
                                                       skillsMask, skillsText, languages);
-            }
-            else
-            {
-                m_log.Debug("[AvatarProfilesModule]: Got null for profile for " + avatarID.ToString());
-            }
+
         }
 
         public void UpdateAvatarProperties(IClientAPI remoteClient, UserProfileData newProfile)
@@ -722,8 +810,11 @@ namespace OpenSimProfile.Modules.OpenProfile
                 ReqHash["FirstLifeImage"] = newProfile.FirstLifeImage.ToString();
                 ReqHash["FirstLifeAboutText"] = newProfile.FirstLifeAboutText;
 
+            string serverURI = string.Empty;
+            bool foreign = GetUserProfileServerURI(remoteClient.AgentId, out serverURI);
+
                 Hashtable result = GenericXMLRPCRequest(ReqHash,
-                        "avatar_properties_update");
+                        "avatar_properties_update", serverURI);
 
                 if (!Convert.ToBoolean(result["success"]))
                 {
@@ -732,6 +823,54 @@ namespace OpenSimProfile.Modules.OpenProfile
                 }
 
                 RequestAvatarProperties(remoteClient, newProfile.ID);
+            }
+        }
+
+        private bool GetUserProfileServerURI(UUID userID, out string serverURI)
+        {
+            IUserManagement uManage = UserManagementModule;
+
+            if(!uManage.IsLocalGridUser(userID))
+            {
+                serverURI = uManage.GetUserServerURL(userID, "ProfileServerURI");
+                // Is Foreign
+                return true;
+            }
+            else
+            {
+                serverURI = m_ProfileServer;
+                // Is local
+                return false;
+            }
+        }
+
+        //
+        // Get the UserAccountBits
+        //
+        private bool GetUserProfileData(UUID userID, out Dictionary<string, object> userInfo)
+        {
+            IUserManagement uManage = UserManagementModule;
+            Dictionary<string,object> info = new Dictionary<string, object>();
+
+            if(!uManage.IsLocalGridUser(userID))
+            {
+                // serverURI = uManage.GetUserServerURL(userID, "ProfileServerURI");
+                info["user_flags"] = uManage.GetUserFlags(userID);
+                info["user_created"] = uManage.GetUserCreated(userID);
+                info["user_title"] = uManage.GetUserTitle(userID);
+                // Is Foreign
+                userInfo = info;
+                return true;
+            }
+            else
+            {
+                // serverURI = m_ProfileServer;
+                // Is local
+                info["user_flags"] = uManage.GetUserFlags(userID);
+                info["user_created"] = uManage.GetUserCreated(userID);
+                info["user_title"] = uManage.GetUserTitle(userID);
+                userInfo = info;
+                return false;
             }
         }
     }
