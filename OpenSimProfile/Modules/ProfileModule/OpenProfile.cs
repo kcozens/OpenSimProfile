@@ -772,7 +772,7 @@ namespace OpenSimProfile.Modules.OpenProfile
                 // The PROFILE information is no longer stored in the user
                 // account. It now needs to be taken from the XMLRPC
                 //
-            remoteClient.SendAvatarProperties(avatarID, aboutText,born,
+                remoteClient.SendAvatarProperties(avatarID, aboutText,born,
                           charterMember, firstLifeAboutText,
                       flags,
                           firstLifeImage, image, profileUrl, partner);
@@ -810,8 +810,8 @@ namespace OpenSimProfile.Modules.OpenProfile
                 ReqHash["FirstLifeImage"] = newProfile.FirstLifeImage.ToString();
                 ReqHash["FirstLifeAboutText"] = newProfile.FirstLifeAboutText;
 
-            string serverURI = string.Empty;
-            bool foreign = GetUserProfileServerURI(remoteClient.AgentId, out serverURI);
+                string serverURI = string.Empty;
+                bool foreign = GetUserProfileServerURI(remoteClient.AgentId, out serverURI);
 
                 Hashtable result = GenericXMLRPCRequest(ReqHash,
                         "avatar_properties_update", serverURI);
