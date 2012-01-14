@@ -1,0 +1,3 @@
+;; Update [LogonService] section to point to your profile server's url
+;; 
+SRV_ProfileServerURI = "http://127.0.0.1/profile.php"
