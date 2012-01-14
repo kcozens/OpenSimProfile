@@ -15,6 +15,7 @@ using OpenSim.Region.Framework.Interfaces;
 using OpenSim.Region.Framework.Scenes;
 using OpenSim.Services.Interfaces;
 using Mono.Addins;
+using OpenSim.Services.Connectors.Hypergrid;
 
 [assembly: Addin("OpenProfileModule", "0.1")]
 [assembly: AddinDependency("OpenSim", "0.5")]
@@ -177,9 +178,6 @@ namespace OpenSimProfile.Modules.OpenProfile
             try
             {
                 XmlRpcRequest Req = new XmlRpcRequest(method, SendParams);
-                // HG Change!
-                // Will need to know the server: Pass it in the ReqParams???
-                // Resp = Req.Send(m_ProfileServer, 30000);
                 Resp = Req.Send(server, 30000);
             }
             catch (WebException ex)
@@ -243,6 +241,11 @@ namespace OpenSimProfile.Modules.OpenProfile
             UUID targetID;
             UUID.TryParse(args[0], out targetID);
 
+            // Can't handle NPC yet...
+            ScenePresence p = FindPresence(targetID);
+            if (p.PresenceType == PresenceType.Npc)
+                return;
+
             string serverURI = string.Empty;
             bool foreign = GetUserProfileServerURI(targetID, out serverURI);
 
@@ -275,8 +278,8 @@ namespace OpenSimProfile.Modules.OpenProfile
 
         // Classifieds Update
         public void ClassifiedInfoUpdate(UUID queryclassifiedID, uint queryCategory, string queryName, string queryDescription, UUID queryParcelID,
-                                         uint queryParentEstate, UUID querySnapshotID, Vector3 queryGlobalPos, byte queryclassifiedFlags,
-                                         int queryclassifiedPrice, IClientAPI remoteClient)
+                                        uint queryParentEstate, UUID querySnapshotID, Vector3 queryGlobalPos, byte queryclassifiedFlags,
+                                        int queryclassifiedPrice, IClientAPI remoteClient)
         {
             Hashtable ReqHash = new Hashtable();
 
@@ -321,7 +324,7 @@ namespace OpenSimProfile.Modules.OpenProfile
         }
 
         // Classifieds Delete
-        public void ClassifiedDelete(UUID queryClassifiedID, IClientAPI remoteClient)
+        public void ClassifiedDelete (UUID queryClassifiedID, IClientAPI remoteClient)
         {
             Hashtable ReqHash = new Hashtable();
 
@@ -350,6 +353,11 @@ namespace OpenSimProfile.Modules.OpenProfile
 
             UUID targetID;
             UUID.TryParse(args[0], out targetID);
+
+            // Can't handle NPC yet...
+            ScenePresence p = FindPresence(targetID);
+            if (p.PresenceType == PresenceType.Npc)
+                return;
 
             string serverURI = string.Empty;
             bool foreign = GetUserProfileServerURI(targetID, out serverURI);
@@ -658,6 +666,16 @@ namespace OpenSimProfile.Modules.OpenProfile
         {
             Hashtable ReqHash = new Hashtable();
 
+            // Can't handle NPC yet...
+            ScenePresence p = FindPresence(userID);
+            if (p.PresenceType == PresenceType.Npc)
+            {
+                Hashtable npc =new Hashtable();
+                npc["success"] = "false";
+                npc["errorMessage"] = "Presence is NPC. ";
+                return npc;
+            }
+
             ReqHash["avatar_id"] = userID.ToString();
 
             string serverURI = string.Empty;
@@ -678,6 +696,12 @@ namespace OpenSimProfile.Modules.OpenProfile
 
         public void RequestAvatarProperties(IClientAPI remoteClient, UUID avatarID)
         {
+
+            // Can't handle NPC yet...
+            ScenePresence p = FindPresence(avatarID);
+            if (p.PresenceType == PresenceType.Npc)
+                return;
+
             IScene s = remoteClient.Scene;
             if (!(s is Scene))
                 return;
@@ -690,7 +714,7 @@ namespace OpenSimProfile.Modules.OpenProfile
             UserAccount account = null;
             Dictionary<string,object> userInfo;
 
-            if (!foreign)
+            if(!foreign)
             {
                 account = scene.UserAccountService.GetUserAccount(scene.RegionInfo.ScopeID, avatarID);
             }
@@ -742,56 +766,57 @@ namespace OpenSimProfile.Modules.OpenProfile
                 }
             }
 
-	    Hashtable profileData = GetProfileData(avatarID);
-	    string profileUrl = string.Empty;
-	    string aboutText = String.Empty;
-	    string firstLifeAboutText = String.Empty;
-	    UUID image = UUID.Zero;
-	    UUID firstLifeImage = UUID.Zero;
-	    UUID partner = UUID.Zero;
-	    uint   wantMask = 0;
-	    string wantText = String.Empty;
-	    uint   skillsMask = 0;
-	    string skillsText = String.Empty;
-	    string languages = String.Empty;
+                Hashtable profileData = GetProfileData(avatarID);
+                string profileUrl = string.Empty;
+                string aboutText = String.Empty;
+                string firstLifeAboutText = String.Empty;
+                UUID image = UUID.Zero;
+                UUID firstLifeImage = UUID.Zero;
+                UUID partner = UUID.Zero;
+                uint   wantMask = 0;
+                string wantText = String.Empty;
+                uint   skillsMask = 0;
+                string skillsText = String.Empty;
+                string languages = String.Empty;
 
-	    if (profileData["ProfileUrl"] != null)
-		profileUrl = profileData["ProfileUrl"].ToString();
-	    if (profileData["AboutText"] != null)
-		aboutText = profileData["AboutText"].ToString();
-	    if (profileData["FirstLifeAboutText"] != null)
-		firstLifeAboutText = profileData["FirstLifeAboutText"].ToString();
-	    if (profileData["Image"] != null)
-		image = new UUID(profileData["Image"].ToString());
-	    if (profileData["FirstLifeImage"] != null)
-		firstLifeImage = new UUID(profileData["FirstLifeImage"].ToString());
-	    if (profileData["Partner"] != null)
-		partner = new UUID(profileData["Partner"].ToString());
+                if (profileData["ProfileUrl"] != null)
+                    profileUrl = profileData["ProfileUrl"].ToString();
+                if (profileData["AboutText"] != null)
+                    aboutText = profileData["AboutText"].ToString();
+                if (profileData["FirstLifeAboutText"] != null)
+                    firstLifeAboutText = profileData["FirstLifeAboutText"].ToString();
+                if (profileData["Image"] != null)
+                    image = new UUID(profileData["Image"].ToString());
+                if (profileData["FirstLifeImage"] != null)
+                    firstLifeImage = new UUID(profileData["FirstLifeImage"].ToString());
+                if (profileData["Partner"] != null)
+                    partner = new UUID(profileData["Partner"].ToString());
 
-	    // The PROFILE information is no longer stored in the user
-	    // account. It now needs to be taken from the XMLRPC
-	    //
-	    remoteClient.SendAvatarProperties(avatarID, aboutText,born,
-		      charterMember, firstLifeAboutText,
-		      flags,
-		      firstLifeImage, image, profileUrl, partner);
+                // The PROFILE information is no longer stored in the user
+                // account. It now needs to be taken from the XMLRPC
+                //
+                remoteClient.SendAvatarProperties(avatarID, aboutText,born,
+                          charterMember, firstLifeAboutText,
+                      flags,
+                          firstLifeImage, image, profileUrl, partner);
 
-	    //Viewer expects interest data when it asks for properties.
-	    if (profileData["wantmask"] != null)
-		wantMask = Convert.ToUInt32(profileData["wantmask"].ToString());
-	    if (profileData["wanttext"] != null)
-		wantText = profileData["wanttext"].ToString();
+                //Viewer expects interest data when it asks for properties.
+                if (profileData["wantmask"] != null)
+                    wantMask = Convert.ToUInt32(profileData["wantmask"].ToString());
+                if (profileData["wanttext"] != null)
+                    wantText = profileData["wanttext"].ToString();
 
-	    if (profileData["skillsmask"] != null)
-		skillsMask = Convert.ToUInt32(profileData["skillsmask"].ToString());
-	    if (profileData["skillstext"] != null)
-		skillsText = profileData["skillstext"].ToString();
+                if (profileData["skillsmask"] != null)
+                    skillsMask = Convert.ToUInt32(profileData["skillsmask"].ToString());
+                if (profileData["skillstext"] != null)
+                    skillsText = profileData["skillstext"].ToString();
 
-	    if (profileData["languages"] != null)
-		languages = profileData["languages"].ToString();
+                if (profileData["languages"] != null)
+                    languages = profileData["languages"].ToString();
 
-	    remoteClient.SendAvatarInterestsReply(avatarID, wantMask, wantText,
-						  skillsMask, skillsText, languages);
+                remoteClient.SendAvatarInterestsReply(avatarID, wantMask, wantText,
+                                                      skillsMask, skillsText, languages);
+
         }
 
         public void UpdateAvatarProperties(IClientAPI remoteClient, UserProfileData newProfile)
@@ -828,7 +853,7 @@ namespace OpenSimProfile.Modules.OpenProfile
         {
             IUserManagement uManage = UserManagementModule;
 
-            if (!uManage.IsLocalGridUser(userID))
+            if(!uManage.IsLocalGridUser(userID))
             {
                 serverURI = uManage.GetUserServerURL(userID, "ProfileServerURI");
                 // Is Foreign
@@ -850,24 +875,34 @@ namespace OpenSimProfile.Modules.OpenProfile
             IUserManagement uManage = UserManagementModule;
             Dictionary<string,object> info = new Dictionary<string, object>();
 
-            if (!uManage.IsLocalGridUser(userID))
+
+            if(!uManage.IsLocalGridUser(userID))
             {
-                // serverURI = uManage.GetUserServerURL(userID, "ProfileServerURI");
-                info["user_flags"] = uManage.GetUserFlags(userID);
-                info["user_created"] = uManage.GetUserCreated(userID);
-                info["user_title"] = uManage.GetUserTitle(userID);
                 // Is Foreign
+                string home_url = uManage.GetUserServerURL(userID, "HomeURI");
+                UserAgentServiceConnector uConn = new UserAgentServiceConnector(home_url);
+
+                Dictionary<string, object> urls = uConn.GetServerURLs(userID);
+                Dictionary<string, object> account = uConn.GetUserInfo(userID);
+
+                info["user_flags"] = account["user_flags"];
+                info["user_created"] = account["user_created"];
+                info["user_title"] = account["user_title"];
                 userInfo = info;
                 return true;
             }
             else
             {
-                // serverURI = m_ProfileServer;
                 // Is local
-                info["user_flags"] = uManage.GetUserFlags(userID);
-                info["user_created"] = uManage.GetUserCreated(userID);
-                info["user_title"] = uManage.GetUserTitle(userID);
+                Scene scene = m_Scenes[0];
+                IUserAccountService uas = scene.UserAccountService;
+                UserAccount account = uas.GetUserAccount(scene.RegionInfo.ScopeID, userID);
+
+                info["user_flags"] = account.UserFlags;
+                info["user_created"] = account.Created;
+                info["user_title"] = account.UserTitle;
                 userInfo = info;
+
                 return false;
             }
         }
