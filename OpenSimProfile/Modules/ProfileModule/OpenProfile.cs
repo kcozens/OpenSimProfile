@@ -275,8 +275,8 @@ namespace OpenSimProfile.Modules.OpenProfile
 
         // Classifieds Update
         public void ClassifiedInfoUpdate(UUID queryclassifiedID, uint queryCategory, string queryName, string queryDescription, UUID queryParcelID,
-                                        uint queryParentEstate, UUID querySnapshotID, Vector3 queryGlobalPos, byte queryclassifiedFlags,
-                                        int queryclassifiedPrice, IClientAPI remoteClient)
+                                         uint queryParentEstate, UUID querySnapshotID, Vector3 queryGlobalPos, byte queryclassifiedFlags,
+                                         int queryclassifiedPrice, IClientAPI remoteClient)
         {
             Hashtable ReqHash = new Hashtable();
 
@@ -321,10 +321,9 @@ namespace OpenSimProfile.Modules.OpenProfile
         }
 
         // Classifieds Delete
-        public void ClassifiedDelete (UUID queryClassifiedID, IClientAPI remoteClient)
+        public void ClassifiedDelete(UUID queryClassifiedID, IClientAPI remoteClient)
         {
             Hashtable ReqHash = new Hashtable();
-
 
             string serverURI = string.Empty;
             bool foreign = GetUserProfileServerURI(remoteClient.AgentId, out serverURI);
@@ -691,7 +690,7 @@ namespace OpenSimProfile.Modules.OpenProfile
             UserAccount account = null;
             Dictionary<string,object> userInfo;
 
-            if(!foreign)
+            if (!foreign)
             {
                 account = scene.UserAccountService.GetUserAccount(scene.RegionInfo.ScopeID, avatarID);
             }
@@ -743,57 +742,56 @@ namespace OpenSimProfile.Modules.OpenProfile
                 }
             }
 
-                Hashtable profileData = GetProfileData(avatarID);
-            string profileUrl = string.Empty;
-                string aboutText = String.Empty;
-                string firstLifeAboutText = String.Empty;
-                UUID image = UUID.Zero;
-                UUID firstLifeImage = UUID.Zero;
-                UUID partner = UUID.Zero;
-                uint   wantMask = 0;
-                string wantText = String.Empty;
-                uint   skillsMask = 0;
-                string skillsText = String.Empty;
-                string languages = String.Empty;
+	    Hashtable profileData = GetProfileData(avatarID);
+	    string profileUrl = string.Empty;
+	    string aboutText = String.Empty;
+	    string firstLifeAboutText = String.Empty;
+	    UUID image = UUID.Zero;
+	    UUID firstLifeImage = UUID.Zero;
+	    UUID partner = UUID.Zero;
+	    uint   wantMask = 0;
+	    string wantText = String.Empty;
+	    uint   skillsMask = 0;
+	    string skillsText = String.Empty;
+	    string languages = String.Empty;
 
-                if (profileData["ProfileUrl"] != null)
-                    profileUrl = profileData["ProfileUrl"].ToString();
-                if (profileData["AboutText"] != null)
-                    aboutText = profileData["AboutText"].ToString();
-                if (profileData["FirstLifeAboutText"] != null)
-                    firstLifeAboutText = profileData["FirstLifeAboutText"].ToString();
-                if (profileData["Image"] != null)
-                    image = new UUID(profileData["Image"].ToString());
-                if (profileData["FirstLifeImage"] != null)
-                    firstLifeImage = new UUID(profileData["FirstLifeImage"].ToString());
-                if (profileData["Partner"] != null)
-                    partner = new UUID(profileData["Partner"].ToString());
+	    if (profileData["ProfileUrl"] != null)
+		profileUrl = profileData["ProfileUrl"].ToString();
+	    if (profileData["AboutText"] != null)
+		aboutText = profileData["AboutText"].ToString();
+	    if (profileData["FirstLifeAboutText"] != null)
+		firstLifeAboutText = profileData["FirstLifeAboutText"].ToString();
+	    if (profileData["Image"] != null)
+		image = new UUID(profileData["Image"].ToString());
+	    if (profileData["FirstLifeImage"] != null)
+		firstLifeImage = new UUID(profileData["FirstLifeImage"].ToString());
+	    if (profileData["Partner"] != null)
+		partner = new UUID(profileData["Partner"].ToString());
 
-                // The PROFILE information is no longer stored in the user
-                // account. It now needs to be taken from the XMLRPC
-                //
-                remoteClient.SendAvatarProperties(avatarID, aboutText,born,
-                          charterMember, firstLifeAboutText,
-                      flags,
-                          firstLifeImage, image, profileUrl, partner);
+	    // The PROFILE information is no longer stored in the user
+	    // account. It now needs to be taken from the XMLRPC
+	    //
+	    remoteClient.SendAvatarProperties(avatarID, aboutText,born,
+		      charterMember, firstLifeAboutText,
+		      flags,
+		      firstLifeImage, image, profileUrl, partner);
 
-                //Viewer expects interest data when it asks for properties.
-                if (profileData["wantmask"] != null)
-                    wantMask = Convert.ToUInt32(profileData["wantmask"].ToString());
-                if (profileData["wanttext"] != null)
-                    wantText = profileData["wanttext"].ToString();
+	    //Viewer expects interest data when it asks for properties.
+	    if (profileData["wantmask"] != null)
+		wantMask = Convert.ToUInt32(profileData["wantmask"].ToString());
+	    if (profileData["wanttext"] != null)
+		wantText = profileData["wanttext"].ToString();
 
-                if (profileData["skillsmask"] != null)
-                    skillsMask = Convert.ToUInt32(profileData["skillsmask"].ToString());
-                if (profileData["skillstext"] != null)
-                    skillsText = profileData["skillstext"].ToString();
+	    if (profileData["skillsmask"] != null)
+		skillsMask = Convert.ToUInt32(profileData["skillsmask"].ToString());
+	    if (profileData["skillstext"] != null)
+		skillsText = profileData["skillstext"].ToString();
 
-                if (profileData["languages"] != null)
-                    languages = profileData["languages"].ToString();
+	    if (profileData["languages"] != null)
+		languages = profileData["languages"].ToString();
 
-                remoteClient.SendAvatarInterestsReply(avatarID, wantMask, wantText,
-                                                      skillsMask, skillsText, languages);
-
+	    remoteClient.SendAvatarInterestsReply(avatarID, wantMask, wantText,
+						  skillsMask, skillsText, languages);
         }
 
         public void UpdateAvatarProperties(IClientAPI remoteClient, UserProfileData newProfile)
@@ -830,7 +828,7 @@ namespace OpenSimProfile.Modules.OpenProfile
         {
             IUserManagement uManage = UserManagementModule;
 
-            if(!uManage.IsLocalGridUser(userID))
+            if (!uManage.IsLocalGridUser(userID))
             {
                 serverURI = uManage.GetUserServerURL(userID, "ProfileServerURI");
                 // Is Foreign
@@ -852,7 +850,7 @@ namespace OpenSimProfile.Modules.OpenProfile
             IUserManagement uManage = UserManagementModule;
             Dictionary<string,object> info = new Dictionary<string, object>();
 
-            if(!uManage.IsLocalGridUser(userID))
+            if (!uManage.IsLocalGridUser(userID))
             {
                 // serverURI = uManage.GetUserServerURL(userID, "ProfileServerURI");
                 info["user_flags"] = uManage.GetUserFlags(userID);
