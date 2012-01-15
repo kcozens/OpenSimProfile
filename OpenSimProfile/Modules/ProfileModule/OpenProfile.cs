@@ -243,8 +243,12 @@ namespace OpenSimProfile.Modules.OpenProfile
 
             // Can't handle NPC yet...
             ScenePresence p = FindPresence(targetID);
-            if (p.PresenceType == PresenceType.Npc)
-                return;
+
+            if (null != p)
+            {
+                if (p.PresenceType == PresenceType.Npc)
+                    return;
+            }
 
             string serverURI = string.Empty;
             bool foreign = GetUserProfileServerURI(targetID, out serverURI);
@@ -356,8 +360,12 @@ namespace OpenSimProfile.Modules.OpenProfile
 
             // Can't handle NPC yet...
             ScenePresence p = FindPresence(targetID);
-            if (p.PresenceType == PresenceType.Npc)
-                return;
+
+            if (null != p)
+            {
+                if (p.PresenceType == PresenceType.Npc)
+                    return;
+            }
 
             string serverURI = string.Empty;
             bool foreign = GetUserProfileServerURI(targetID, out serverURI);
@@ -668,12 +676,16 @@ namespace OpenSimProfile.Modules.OpenProfile
 
             // Can't handle NPC yet...
             ScenePresence p = FindPresence(userID);
-            if (p.PresenceType == PresenceType.Npc)
+
+            if (null != p)
             {
-                Hashtable npc =new Hashtable();
-                npc["success"] = "false";
-                npc["errorMessage"] = "Presence is NPC. ";
-                return npc;
+                if (p.PresenceType == PresenceType.Npc)
+                {
+                    Hashtable npc =new Hashtable();
+                    npc["success"] = "false";
+                    npc["errorMessage"] = "Presence is NPC. ";
+                    return npc;
+                }
             }
 
             ReqHash["avatar_id"] = userID.ToString();
@@ -699,8 +711,12 @@ namespace OpenSimProfile.Modules.OpenProfile
 
             // Can't handle NPC yet...
             ScenePresence p = FindPresence(avatarID);
-            if (p.PresenceType == PresenceType.Npc)
-                return;
+
+            if (null != p)
+            {
+                if (p.PresenceType == PresenceType.Npc)
+                    return;
+            }
 
             IScene s = remoteClient.Scene;
             if (!(s is Scene))
@@ -886,7 +902,7 @@ namespace OpenSimProfile.Modules.OpenProfile
 
                 info["user_flags"] = account["user_flags"];
                 info["user_created"] = account["user_created"];
-                info["user_title"] = account["user_title"];
+                info["user_title"] = "HG Visitor";
                 userInfo = info;
                 return true;
             }
@@ -899,7 +915,12 @@ namespace OpenSimProfile.Modules.OpenProfile
 
                 info["user_flags"] = account.UserFlags;
                 info["user_created"] = account.Created;
-                info["user_title"] = account.UserTitle;
+
+                if (!String.IsNullOrEmpty(account.UserTitle))
+                    info["user_title"] = account.UserTitle;
+                else
+                    info["user_title"] = "";
+
                 userInfo = info;
 
                 return false;
