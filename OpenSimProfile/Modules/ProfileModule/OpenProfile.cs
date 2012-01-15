@@ -693,6 +693,17 @@ namespace OpenSimProfile.Modules.OpenProfile
             string serverURI = string.Empty;
             bool foreign = GetUserProfileServerURI(userID, out serverURI);
 
+            // This is checking a friend on the home grid
+            // Not HG friend
+            if ( String.IsNullOrEmpty(serverURI))
+            {
+                Hashtable nop =new Hashtable();
+                nop["success"] = "false";
+                nop["errorMessage"] = "No Presence - foreign friend";
+                return nop;
+
+            }
+
             Hashtable result = GenericXMLRPCRequest(ReqHash,
                     "avatar_properties_request", serverURI);
 
@@ -757,7 +768,6 @@ namespace OpenSimProfile.Modules.OpenProfile
                 born = Util.ToDateTime(account.Created).ToString(
                                   "M/d/yyyy", CultureInfo.InvariantCulture);
                 flags = (uint)(account.UserFlags & 0xff);
-
             }
             else
             {
@@ -895,6 +905,17 @@ namespace OpenSimProfile.Modules.OpenProfile
             {
                 // Is Foreign
                 string home_url = uManage.GetUserServerURL(userID, "HomeURI");
+
+                if (String.IsNullOrEmpty(home_url))
+                {
+                    info["user_flags"] = 0;
+                    info["user_created"] = 0;
+                    info["user_title"] = "Unavailable";
+
+                    userInfo = info;
+                    return true;
+                }
+
                 UserAgentServiceConnector uConn = new UserAgentServiceConnector(home_url);
 
                 Dictionary<string, object> account = uConn.GetUserInfo(userID);
