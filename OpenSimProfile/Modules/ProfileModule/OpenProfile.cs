@@ -897,12 +897,28 @@ namespace OpenSimProfile.Modules.OpenProfile
                 string home_url = uManage.GetUserServerURL(userID, "HomeURI");
                 UserAgentServiceConnector uConn = new UserAgentServiceConnector(home_url);
 
-                Dictionary<string, object> urls = uConn.GetServerURLs(userID);
                 Dictionary<string, object> account = uConn.GetUserInfo(userID);
 
-                info["user_flags"] = account["user_flags"];
-                info["user_created"] = account["user_created"];
-                info["user_title"] = "HG Visitor";
+                if (account.Count > 0)
+                {
+                    if (account.ContainsKey("user_flags"))
+                        info["user_flags"] = account["user_flags"];
+                    else
+                        info["user_flags"] = "";
+
+                    if (account.ContainsKey("user_created"))
+                        info["user_created"] = account["user_created"];
+                    else
+                        info["user_created"] = "";
+
+                    info["user_title"] = "HG Visitor";
+                }
+                else
+                {
+                   info["user_flags"] = 0;
+                   info["user_created"] = 0;
+                   info["user_title"] = "HG Visitor";
+                }
                 userInfo = info;
                 return true;
             }
