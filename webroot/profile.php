@@ -78,8 +78,8 @@ function classified_update($method_name, $params, $app_data)
     $parentestate   = $req['parentestate'];
     $snapshotuuid   = $req['snapshotUUID'];
     $simname        = $req['sim_name'];
-    $globalpos      = $req['globalpos'];
     $parcelname     = $req['parcelname'];
+    $globalpos      = $req['globalpos'];
     $classifiedflag = $req['classifiedFlags'];
     $priceforlist   = $req['classifiedPrice'];
 
@@ -92,33 +92,33 @@ function classified_update($method_name, $params, $app_data)
         $ready = $row[0];
     }
 
+    // Doing some late checking
+    // Should be done by the module but let's see what happens when
+    // I do it here
+
+    if ($parcelname == "")
+        $parcelname = "Unknown";
+
+    if ($parceluuid == "")
+        $parceluuid = $zeroUUID;
+
+    if ($description == "")
+        $description = "No Description";
+
     if ($ready == 0)
     {
-        // Doing some late checking
-        // Should be done by the module but let's see what happens when
-        // I do it here
-
-        if($parcelname == "")
-            $parcelname = "Unknown";
-
-        if($parceluuid == "")
-            $parceluuid = $zeroUUID;
-
-        if($description == "")
-            $description = "No Description";
-
-        if($classifiedflag == 2)
+        if ($classifiedflag == 0)
         {
             $creationdate = time();
             $expirationdate = time() + (7 * 24 * 60 * 60);
         }
-        else
+        else    /* classifiedflag == 32 */
         {
             $creationdate = time();
-            $expirationdate = time() + (365 * 24 * 60 * 60);
+            $expirationdate = time() + (52 * 7 * 24 * 60 * 60);
         }
 
-        $insertquery = "INSERT INTO classifieds VALUES ".
+        $sql = "INSERT INTO classifieds VALUES ".
             "('". mysql_real_escape_string($classifieduuid) ."',".
             "'". mysql_real_escape_string($creator) ."',".
             "". mysql_real_escape_string($creationdate) .",".
@@ -131,21 +131,38 @@ function classified_update($method_name, $params, $app_data)
             "'". mysql_real_escape_string($snapshotuuid) ."',".
             "'". mysql_real_escape_string($simname) ."',".
             "'". mysql_real_escape_string($globalpos) ."',".
-            "'". mysql_real_escape_string($parcelname) ."',".
+            "'". $parcelname ."',".
             "". mysql_real_escape_string($classifiedflag) .",".
             "". mysql_real_escape_string($priceforlist) .")";
-
-        // Create a new record for this classified
-        $result = mysql_query($insertquery);
     }
     else
     {
+        $expirationdate = $creationdate + (52 * 7 * 24 * 60 * 60);
 
+        $sql = "UPDATE classifieds SET ".
+            "`creatoruuid`='". mysql_real_escape_string($creator)."',".
+            "`expirationdate`=". mysql_real_escape_string($expirationdate).",".
+            "`category`='". mysql_real_escape_string($category)."',".
+            "`name`='". mysql_real_escape_string($name)."',".
+            "`description`='". mysql_real_escape_string($description)."',".
+            "`parceluuid`='". mysql_real_escape_string($parceluuid)."',".
+            "`parentestate`=". mysql_real_escape_string($parentestate).",".
+            "`snapshotuuid`='". mysql_real_escape_string($snapshotuuid)."',".
+            "`simname`='". mysql_real_escape_string($simname)."',".
+            "`posglobal`='". mysql_real_escape_string($globalpos)."',".
+            "`parcelname`='". $parcelname."',".
+            "`classifiedflags`=". mysql_real_escape_string($classifiedflag).",".
+            "`priceforlisting`=". mysql_real_escape_string($priceforlist).
+            " WHERE ".
+            "`classifieduuid`='". mysql_real_escape_string($classifieduuid)."'";
     }
 
+    // Create a new record for this classified
+    $result = mysql_query($sql);
+
     $response_xml = xmlrpc_encode(array(
-        'success' => True,
-        'data' => $data
+        'success' => $result,
+        'errorMessage' => mysql_error()
     ));
 
     print $response_xml;
@@ -280,10 +297,10 @@ function picks_update($method_name, $params, $app_data)
     $sortorder      = $req['sort_order'];
     $enabled        = $req['enabled'];
 
-    if($parceluuid == "")
+    if ($parceluuid == "")
         $parceluuid = $zeroUUID;
 
-    if($description == "")
+    if ($description == "")
         $description = "No Description";
 
     // Check if we already have this one in the database
@@ -294,7 +311,7 @@ function picks_update($method_name, $params, $app_data)
 
     if ($row[0] == 0)
     {
-        if($user == null || $user == "")
+        if ($user == null || $user == "")
             $user = "Unknown";
 
         //The original parcel name is the same as the name of the
@@ -448,8 +465,7 @@ function avatar_notes_update($method_name, $params, $app_data)
     }
 
     $response_xml = xmlrpc_encode(array(
-        'success' => $result,
-        'errorMessage' => mysql_error()
+        'success' => True
     ));
 
     print $response_xml;

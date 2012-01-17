@@ -287,6 +287,15 @@ namespace OpenSimProfile.Modules.OpenProfile
         {
             Hashtable ReqHash = new Hashtable();
 
+            Scene s = (Scene) remoteClient.Scene;
+            Vector3 pos = remoteClient.SceneAgent.AbsolutePosition;
+            ILandObject land = s.LandChannel.GetLandObject(pos.X, pos.Y);
+
+            if (land == null)
+                ReqHash["parcelname"] = String.Empty;
+            else
+                ReqHash["parcelname"] = land.LandData.Name;
+
             ReqHash["creatorUUID"] = remoteClient.AgentId.ToString();
             ReqHash["classifiedUUID"] = queryclassifiedID.ToString();
             ReqHash["category"] = queryCategory.ToString();
@@ -308,7 +317,7 @@ namespace OpenSimProfile.Modules.OpenProfile
             Vector3 avaPos = p.AbsolutePosition;
 
             // Getting the parceluuid for this parcel
-            ReqHash["parcel_uuid"] = p.currentParcelUUID.ToString();
+            ReqHash["parcelUUID"] = p.currentParcelUUID.ToString();
 
             // Getting the global position for the Avatar
             Vector3 posGlobal = new Vector3(remoteClient.Scene.RegionInfo.RegionLocX * Constants.RegionSize + avaPos.X,
