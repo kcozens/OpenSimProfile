@@ -728,6 +728,12 @@ namespace OpenSimProfile.Modules.OpenProfile
 
         public void RequestAvatarProperties(IClientAPI remoteClient, UUID avatarID)
         {
+            if ( String.IsNullOrEmpty(avatarID.ToString()) || String.IsNullOrEmpty(remoteClient.AgentId.ToString()))
+            {
+                // Looking for a reason that some viewers are sending null Id's
+                m_log.InfoFormat("[PROFILE]: This should not happen remoteClient.AgentId {0} - avatarID {1}", remoteClient.AgentId, avatarID);
+                return;
+            }
 
             // Can't handle NPC yet...
             ScenePresence p = FindPresence(avatarID);
