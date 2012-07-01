@@ -107,6 +107,7 @@ function classified_update($method_name, $params, $app_data)
 
     if ($ready == 0)
     {
+        //Renew Weekly flag is 32 (1 << 5)
         if ($classifiedflag == 0)
         {
             $creationdate = time();
