@@ -105,15 +105,21 @@ function classified_update($method_name, $params, $app_data)
     if ($description == "")
         $description = "No Description";
 
+    //If PG, Mature, and Adult flags are all 0 assume PG and set bit 2.
+    //This works around what might be a viewer bug regarding the flags.
+    //The ossearch query.php file expects bit 2 set for any PG listing.
+    if (($classifiedflag & 76) == 0)
+        $classifiedflag |= 4;
+
     if ($ready == 0)
     {
         //Renew Weekly flag is 32 (1 << 5)
-        if ($classifiedflag == 0)
+        if ($classifiedflag & 32 == 0)
         {
             $creationdate = time();
             $expirationdate = time() + (7 * 24 * 60 * 60);
         }
-        else    /* classifiedflag == 32 */
+        else
         {
             $creationdate = time();
             $expirationdate = time() + (52 * 7 * 24 * 60 * 60);
@@ -679,6 +685,7 @@ function user_preferences_update($method_name, $params, $app_data)
 #
 
 $request_xml = $HTTP_RAW_POST_DATA;
+
 xmlrpc_server_call_method($xmlrpc_server, $request_xml, '');
 xmlrpc_server_destroy($xmlrpc_server);
 ?>
