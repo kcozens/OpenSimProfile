@@ -684,7 +684,7 @@ function user_preferences_update($method_name, $params, $app_data)
 # Process the request
 #
 
-$request_xml = $HTTP_RAW_POST_DATA;
+$request_xml = file_get_contents("php://input");
 
 xmlrpc_server_call_method($xmlrpc_server, $request_xml, '');
 xmlrpc_server_destroy($xmlrpc_server);
