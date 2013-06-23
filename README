@@ -1,0 +1,125 @@
+OpenSimProfile add-on module for Open Simulator
+
+Requirements
+
+A webserver with PHP 4.3 (or later) support.
+
+
+About the files
+
+README - The file you are currently reading
+
+bin/OpenSimProfile.Modules.dll - A pre-compiled module you can use
+
+OpenSimProfile/ - Source code for OpenSim profile module
+
+webroot/*.php - Files to install on webserver
+
+webroot/sql/osprofile.sql - This will create the needed database tables
+webroot/sql/update-*.sql  - Files used to update an older installation
+
+
+How it works
+
+If you are looking for a detailed explanation of how the add-on profile system
+works you should study the contents of the files which accompany this README
+file. What follows is a general overview of the profile package to give you
+an idea of how the pieces fit together in case you have any problems.
+
+There are three main components to OpenSimProfile which are a database, a DLL
+file, and a couple of PHP files.
+
+The profile database contains five tables. Four of the tables hold the profile
+information. The fifth table holds information about classified ads and is a
+table also used by the OpenSim search module, ossearch.
+
+
+Compiling the module
+
+The easiest way to create the DLL file needed by OpenSim is to add the
+OpenSimProfile C# source file to the source tree of OpenSim so it will
+be compiled at the same time that OpenSim is compiled.
+
+Copy the OpenSimProfile directory in to the addon-modules directory of your
+OpenSim source tree. After you have done that, compile OpenSim in the usual
+way (runprebuild and nant) to create the DLL file.  When nant finishes, you
+will have an OpenSimProfile.Modules.dll file in the main bin directory of
+your OpenSim source tree along with a matching .pdb (or .mdb) file. These
+two files will be copied to the bin directory of your OpenSim instances
+during the installation or update steps.
+
+
+First time installation and configuration
+
+The first installation step is the creation of a database that will hold
+the profile data. If you have already installed the add-on ossearch module
+you should use the ossearch database as the search and profile modules
+share some tables in common.
+
+If you don't have the ossearch module installed you will need to create a
+new database that will hold the profile tables. Once you know the name of
+the database you will be using for the profile data you can use osprofile.sql
+(located in the webroot/sql directory) to create the required tables in the
+database. The name of this database will be needed in a later step when you
+configure one of the PHP files.
+
+Copy the PHP files (located in the webroot directory) to your webserver.
+Remember to set the ownership and permissions on the files so the webserver
+may access the files. Use a text editor to open databaseinfo.php and enter
+the name or IP address of the database server, the name of the database,
+and the user name and password required to access the database.
+
+As of Subversion revision 110 of osprofile, there are two main profile PHP
+files: profile.php, and profile_mysqli.php. Only one of these two files is
+needed. If you want to use the mysqli based profile_mysqli.php file you can
+delete the profile.php file and rename profile_mysqli.php to profile.php.
+If you don't rename the profile_mysqli.php file you will need to alter the
+ProfileURL line shown below with the name of the mysqli based file.
+
+The next part of the installation process is to set up and configure your
+OpenSim instances.
+
+Copy the two OpenSimProfile.Modules files created during the compile steps
+(above) to the bin directory of each of your OpenSim instances. The next
+part of the installation process requires some changes to the OpenSim.ini
+in all of your OpenSim instances.
+
+Add the following lines to all OpenSim.ini files:
+
+  [Profile]
+  Module = "OpenSimProfile";	//This line is optional and is the default.
+  ;////////////////////////////////////////////////////////////////////////////
+  ;// The ProfileURL is important. It must be correct or profiles won't work.//
+  ;//                                                                        //
+  ;// Change the URL to point to the profile.php file on your own web server //
+  ProfileURL = http://192.168.0.1/profile.php
+  ;//                                                                        //
+  ;////////////////////////////////////////////////////////////////////////////
+
+NOTE: You do not need to indent the above lines when adding them to your own
+OpenSim.ini file. The lines were indented to offset them from the rest of the
+text in this file.
+
+
+Updating an existing installation
+
+Updating an existing installation of osprofile is just a matter of copying
+a few files to the same places where you had previously installed the files.
+
+Copy all of the PHP files (located in the webroot directory) EXCEPT for
+databaseinfo.php to the directory on your webserver where you place the
+previous copies. If you also copy databaseinfo.php when copying the other
+PHP files you will have to edit databaseinfo.php and reset the information
+used to connect to the database.
+
+See the section "First time installation and configuration" section above
+for information about the two main profile PHP files. If you were using
+the mysqli based file, you may need to delete one of the PHP files and
+rename the other.
+
+Copy the two OpenSimProfile.Modules files created during compilation to the
+bin directory of each of your OpenSim instances.
+
+Finally, execute all of the SQL files located in the webroot/sql directory
+where the filenames start with "update-". This step is very important to
+make certain your database tables are up-to-date.
