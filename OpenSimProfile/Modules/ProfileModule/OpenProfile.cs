@@ -17,7 +17,7 @@ using OpenSim.Services.Interfaces;
 using Mono.Addins;
 using OpenSim.Services.Connectors.Hypergrid;
 
-[assembly: Addin("OpenProfileModule", "0.1")]
+[assembly: Addin("OpenProfileModule", "0.2")]
 [assembly: AddinDependency("OpenSim", "0.5")]
 
 namespace OpenSimProfile.Modules.OpenProfile
@@ -33,7 +33,6 @@ namespace OpenSimProfile.Modules.OpenProfile
         //
         // Module vars
         //
-        private IConfigSource m_Config;
         private List<Scene> m_Scenes = new List<Scene>();
         private string m_ProfileServer = "";
         private bool m_Enabled = true;
@@ -50,28 +49,30 @@ namespace OpenSimProfile.Modules.OpenProfile
         }
 
         #region IRegionModuleBase implementation
-        public void Initialise(IConfigSource source)
+        public void Initialise(IConfigSource config)
         {
-            m_Config = source;
-
-            IConfig profileConfig = m_Config.Configs["Profile"];
+            IConfig profileConfig = config.Configs["Profile"];
 
             if (profileConfig == null)
             {
                 m_Enabled = false;
                 return;
             }
+            if (profileConfig.GetString("Module", "OpenSimProfile") != "OpenSimProfile")
+            {
+                m_Enabled = false;
+                return;
+            }
+
             m_ProfileServer = profileConfig.GetString("ProfileURL", "");
             if (m_ProfileServer == "")
             {
                 m_Enabled = false;
                 return;
             }
-            else
-            {
-                m_log.Info("[PROFILE] OpenProfile module is activated");
-                m_Enabled = true;
-            }
+
+            m_log.Info("[PROFILE] OpenProfile module is activated");
+            m_Enabled = true;
         }
 
         public void AddRegion(Scene scene)
@@ -402,6 +403,8 @@ namespace OpenSimProfile.Modules.OpenProfile
                 {
                     Hashtable d = (Hashtable)o;
 
+                    //FIXME: Check that name string is not an empty string
+                    //How will empty name affect retrieval of pick data?
                     picks[new UUID(d["pickid"].ToString())] = d["name"].ToString();
                 }
             }
@@ -807,56 +810,56 @@ namespace OpenSimProfile.Modules.OpenProfile
                 }
             }
 
-	    Hashtable profileData = GetProfileData(avatarID);
-	    string profileUrl = string.Empty;
-	    string aboutText = String.Empty;
-	    string firstLifeAboutText = String.Empty;
-	    UUID image = UUID.Zero;
-	    UUID firstLifeImage = UUID.Zero;
-	    UUID partner = UUID.Zero;
-	    uint   wantMask = 0;
-	    string wantText = String.Empty;
-	    uint   skillsMask = 0;
-	    string skillsText = String.Empty;
-	    string languages = String.Empty;
+        Hashtable profileData = GetProfileData(avatarID);
+        string profileUrl = string.Empty;
+        string aboutText = String.Empty;
+        string firstLifeAboutText = String.Empty;
+        UUID image = UUID.Zero;
+        UUID firstLifeImage = UUID.Zero;
+        UUID partner = UUID.Zero;
+        uint   wantMask = 0;
+        string wantText = String.Empty;
+        uint   skillsMask = 0;
+        string skillsText = String.Empty;
+        string languages = String.Empty;
 
-	    if (profileData["ProfileUrl"] != null)
-		profileUrl = profileData["ProfileUrl"].ToString();
-	    if (profileData["AboutText"] != null)
-		aboutText = profileData["AboutText"].ToString();
-	    if (profileData["FirstLifeAboutText"] != null)
-		firstLifeAboutText = profileData["FirstLifeAboutText"].ToString();
-	    if (profileData["Image"] != null)
-		image = new UUID(profileData["Image"].ToString());
-	    if (profileData["FirstLifeImage"] != null)
-		firstLifeImage = new UUID(profileData["FirstLifeImage"].ToString());
-	    if (profileData["Partner"] != null)
-		partner = new UUID(profileData["Partner"].ToString());
+        if (profileData["ProfileUrl"] != null)
+        profileUrl = profileData["ProfileUrl"].ToString();
+        if (profileData["AboutText"] != null)
+        aboutText = profileData["AboutText"].ToString();
+        if (profileData["FirstLifeAboutText"] != null)
+        firstLifeAboutText = profileData["FirstLifeAboutText"].ToString();
+        if (profileData["Image"] != null)
+        image = new UUID(profileData["Image"].ToString());
+        if (profileData["FirstLifeImage"] != null)
+        firstLifeImage = new UUID(profileData["FirstLifeImage"].ToString());
+        if (profileData["Partner"] != null)
+        partner = new UUID(profileData["Partner"].ToString());
 
-	    // The PROFILE information is no longer stored in the user
-	    // account. It now needs to be taken from the XMLRPC
-	    //
-	    remoteClient.SendAvatarProperties(avatarID, aboutText,born,
-		      charterMember, firstLifeAboutText,
-		  flags,
-		      firstLifeImage, image, profileUrl, partner);
+        // The PROFILE information is no longer stored in the user
+        // account. It now needs to be taken from the XMLRPC
+        //
+        remoteClient.SendAvatarProperties(avatarID, aboutText,born,
+              charterMember, firstLifeAboutText,
+          flags,
+              firstLifeImage, image, profileUrl, partner);
 
-	    //Viewer expects interest data when it asks for properties.
-	    if (profileData["wantmask"] != null)
-		wantMask = Convert.ToUInt32(profileData["wantmask"].ToString());
-	    if (profileData["wanttext"] != null)
-		wantText = profileData["wanttext"].ToString();
+        //Viewer expects interest data when it asks for properties.
+        if (profileData["wantmask"] != null)
+        wantMask = Convert.ToUInt32(profileData["wantmask"].ToString());
+        if (profileData["wanttext"] != null)
+        wantText = profileData["wanttext"].ToString();
 
-	    if (profileData["skillsmask"] != null)
-		skillsMask = Convert.ToUInt32(profileData["skillsmask"].ToString());
-	    if (profileData["skillstext"] != null)
-		skillsText = profileData["skillstext"].ToString();
+        if (profileData["skillsmask"] != null)
+        skillsMask = Convert.ToUInt32(profileData["skillsmask"].ToString());
+        if (profileData["skillstext"] != null)
+        skillsText = profileData["skillstext"].ToString();
 
-	    if (profileData["languages"] != null)
-		languages = profileData["languages"].ToString();
+        if (profileData["languages"] != null)
+        languages = profileData["languages"].ToString();
 
-	    remoteClient.SendAvatarInterestsReply(avatarID, wantMask, wantText,
-						  skillsMask, skillsText, languages);
+        remoteClient.SendAvatarInterestsReply(avatarID, wantMask, wantText,
+                          skillsMask, skillsText, languages);
         }
 
         public void UpdateAvatarProperties(IClientAPI remoteClient, UserProfileData newProfile)
