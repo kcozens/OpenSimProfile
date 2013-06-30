@@ -87,7 +87,7 @@ in all of your OpenSim instances.
 Add the following lines to all OpenSim.ini files:
 
   [Profile]
-  Module = "OpenSimProfile";	//This line is optional and is the default.
+  Module = "OpenSimProfile";
   ;////////////////////////////////////////////////////////////////////////////
   ;// The ProfileURL is important. It must be correct or profiles won't work.//
   ;//                                                                        //
