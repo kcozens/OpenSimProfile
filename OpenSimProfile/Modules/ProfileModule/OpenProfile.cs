@@ -331,7 +331,7 @@ namespace OpenSimProfile.Modules.OpenProfile
             IMoneyModule money = s.RequestModuleInterface<IMoneyModule>();
             if (money != null)
             {
-                if (!money.AmountCovered(remoteClient.AgentId, money.GroupCreationCharge))
+                if (!money.AmountCovered(remoteClient.AgentId, queryclassifiedPrice))
                 {
                     remoteClient.SendCreateGroupReply(UUID.Zero, false, "Insufficient funds to create a classified ad.");
                     return;
@@ -350,7 +350,7 @@ namespace OpenSimProfile.Modules.OpenProfile
 
             if (money != null && Convert.ToBoolean(result["created"]))
             {
-                money.ApplyCharge(remoteClient.AgentId, money.GroupCreationCharge,
+                money.ApplyCharge(remoteClient.AgentId, queryclassifiedPrice,
                                   "Classified ad created: " + queryName);
             }
         }
