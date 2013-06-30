@@ -327,6 +327,17 @@ namespace OpenSimProfile.Modules.OpenProfile
 
             ReqHash["pos_global"] = posGlobal.ToString();
 
+            //Check available funds if there is a money module present
+            IMoneyModule money = s.RequestModuleInterface<IMoneyModule>();
+            if (money != null)
+            {
+                if (!money.AmountCovered(remoteClient.AgentId, money.GroupCreationCharge))
+                {
+                    remoteClient.SendCreateGroupReply(UUID.Zero, false, "Insufficient funds to create a classified ad.");
+                    return;
+                }
+            }
+
             Hashtable result = GenericXMLRPCRequest(ReqHash,
                     "classified_update", serverURI);
 
@@ -334,6 +345,13 @@ namespace OpenSimProfile.Modules.OpenProfile
             {
                 remoteClient.SendAgentAlertMessage(
                         result["errorMessage"].ToString(), false);
+                return;
+            }
+
+            if (money != null && Convert.ToBoolean(result["created"]))
+            {
+                money.ApplyCharge(remoteClient.AgentId, money.GroupCreationCharge,
+                                  "Classified ad created: " + queryName);
             }
         }
 

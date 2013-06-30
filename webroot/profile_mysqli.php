@@ -1,13 +1,13 @@
 <?php
 
-define("C_DB_HOST"      ,"localhost"); 
-define("C_DB_DATABASE"  ,""); 
-define("C_DB_USER"      ,""); 
-define("C_DB_PASS"      ,""); 
+define("C_DB_HOST"      ,"localhost");
+define("C_DB_DATABASE"  ,"");
+define("C_DB_USER"      ,"");
+define("C_DB_PASS"      ,"");
 
 #
 #  Copyright (c)Melanie Thielker (http://opensimulator.org/)
-#  modified by Richardus Raymaker to support mysqli.    
+#  modified by Richardus Raymaker to support mysqli.
 #
 
 ###################### No user serviceable parts below #####################
@@ -24,9 +24,9 @@ function openDB($dbHost,$dbUser,$dbPassword,$dbName)
 {
     /*Open database*/
     $link = mysqli_connect($dbHost,$dbUser,$dbPassword,$dbName);
-    if (!$link) { die('Connect Error (' . mysqli_connect_errno() . ') '. mysqli_connect_error()); exit; } 
+    if (!$link) { die('Connect Error (' . mysqli_connect_errno() . ') '. mysqli_connect_error()); exit; }
     mysqli_set_charset($link, "utf8");
-    
+
     return $link;
 }
 
@@ -34,7 +34,7 @@ function openDB($dbHost,$dbUser,$dbPassword,$dbName)
 function closeDB($link)
 {
     /*Close database*/
-    mysqli_close($link); 
+    mysqli_close($link);
 }
 
 #---------------------
@@ -102,7 +102,7 @@ function classified_update($method_name, $params, $app_data)
 
     while ($row = mysqli_fetch_row($check))
     {
-        $ready = $row[0];
+        $found = $row[0];
     }
 
     // Doing some late checking
@@ -124,20 +124,20 @@ function classified_update($method_name, $params, $app_data)
     if (($classifiedflag & 76) == 0)
         $classifiedflag |= 4;
 
-    if ($ready == 0)
+    //Renew Weekly flag is 32 (1 << 5)
+    if (($classifiedflag & 32) == 0)
     {
-        //Renew Weekly flag is 32 (1 << 5)
-        if (($classifiedflag & 32) == 0)
-        {
-            $creationdate = time();
-            $expirationdate = time() + (7 * 24 * 60 * 60);
-        }
-        else
-        {
-            $creationdate = time();
-            $expirationdate = time() + (52 * 7 * 24 * 60 * 60);
-        }
+        $creationdate = time();
+        $expirationdate = time() + (7 * 24 * 60 * 60);
+    }
+    else
+    {
+        $creationdate = time();
+        $expirationdate = time() + (52 * 7 * 24 * 60 * 60);
+    }
 
+    if ($found == 0)
+    {
         $sql = "INSERT INTO classifieds VALUES ".
             "('". mysqli_real_escape_string($link,$classifieduuid) ."',".
             "'". mysqli_real_escape_string($link,$creator) ."',".
@@ -157,8 +157,6 @@ function classified_update($method_name, $params, $app_data)
     }
     else
     {
-        $expirationdate = $creationdate + (52 * 7 * 24 * 60 * 60);
-
         $sql = "UPDATE classifieds SET ".
             "`creatoruuid`='". mysqli_real_escape_string($link,$creator)."',".
             "`expirationdate`=". mysqli_real_escape_string($link,$expirationdate).",".
@@ -182,6 +180,7 @@ function classified_update($method_name, $params, $app_data)
 
     $response_xml = xmlrpc_encode(array(
         'success' => $result,
+        'created' => $found == 0,
         'errorMessage' => mysqli_error($link)
     ));
 
@@ -675,7 +674,7 @@ function user_preferences_request($method_name, $params, $app_data)
 }
 
 #---------------------
-# User Preferences Update 
+# User Preferences Update
 xmlrpc_server_register_method($xmlrpc_server, "user_preferences_update","user_preferences_update");
 function user_preferences_update($method_name, $params, $app_data)
 {

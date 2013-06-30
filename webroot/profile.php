@@ -89,7 +89,7 @@ function classified_update($method_name, $params, $app_data)
 
     while ($row = mysql_fetch_row($check))
     {
-        $ready = $row[0];
+        $found = $row[0];
     }
 
     // Doing some late checking
@@ -111,20 +111,20 @@ function classified_update($method_name, $params, $app_data)
     if (($classifiedflag & 76) == 0)
         $classifiedflag |= 4;
 
-    if ($ready == 0)
+    //Renew Weekly flag is 32 (1 << 5)
+    if (($classifiedflag & 32) == 0)
     {
-        //Renew Weekly flag is 32 (1 << 5)
-        if (($classifiedflag & 32) == 0)
-        {
-            $creationdate = time();
-            $expirationdate = time() + (7 * 24 * 60 * 60);
-        }
-        else
-        {
-            $creationdate = time();
-            $expirationdate = time() + (52 * 7 * 24 * 60 * 60);
-        }
+        $creationdate = time();
+        $expirationdate = time() + (7 * 24 * 60 * 60);
+    }
+    else
+    {
+        $creationdate = time();
+        $expirationdate = time() + (52 * 7 * 24 * 60 * 60);
+    }
 
+    if ($found == 0)
+    {
         $sql = "INSERT INTO classifieds VALUES ".
             "('". mysql_real_escape_string($classifieduuid) ."',".
             "'". mysql_real_escape_string($creator) ."',".
@@ -144,8 +144,6 @@ function classified_update($method_name, $params, $app_data)
     }
     else
     {
-        $expirationdate = $creationdate + (52 * 7 * 24 * 60 * 60);
-
         $sql = "UPDATE classifieds SET ".
             "`creatoruuid`='". mysql_real_escape_string($creator)."',".
             "`expirationdate`=". mysql_real_escape_string($expirationdate).",".
@@ -169,6 +167,7 @@ function classified_update($method_name, $params, $app_data)
 
     $response_xml = xmlrpc_encode(array(
         'success' => $result,
+        'created' => $found == 0,
         'errorMessage' => mysql_error()
     ));
 
