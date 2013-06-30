@@ -403,9 +403,10 @@ namespace OpenSimProfile.Modules.OpenProfile
                 {
                     Hashtable d = (Hashtable)o;
 
-                    //FIXME: Check that name string is not an empty string
-                    //How will empty name affect retrieval of pick data?
-                    picks[new UUID(d["pickid"].ToString())] = d["name"].ToString();
+                    if (d["name"] == null)
+                        picks[new UUID(d["pickid"].ToString())] = String.Empty;
+                    else
+                        picks[new UUID(d["pickid"].ToString())] = d["name"].ToString();
                 }
             }
 
@@ -447,6 +448,9 @@ namespace OpenSimProfile.Modules.OpenProfile
 
             Vector3 globalPos = new Vector3();
             Vector3.TryParse(d["posglobal"].ToString(), out globalPos);
+
+            if (d["name"] == null)
+                d["name"] = String.Empty;
 
             if (d["description"] == null)
                 d["description"] = String.Empty;
