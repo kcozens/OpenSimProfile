@@ -252,7 +252,7 @@ namespace OpenSimProfile.Modules.OpenProfile
             }
 
             string serverURI = string.Empty;
-            bool foreign = GetUserProfileServerURI(targetID, out serverURI);
+            GetUserProfileServerURI(targetID, out serverURI);
 
             Hashtable ReqHash = new Hashtable();
             ReqHash["uuid"] = args[0];
@@ -313,7 +313,7 @@ namespace OpenSimProfile.Modules.OpenProfile
 
 
             string serverURI = string.Empty;
-            bool foreign = GetUserProfileServerURI(remoteClient.AgentId, out serverURI);
+            GetUserProfileServerURI(remoteClient.AgentId, out serverURI);
 
             Vector3 avaPos = p.AbsolutePosition;
 
@@ -343,7 +343,7 @@ namespace OpenSimProfile.Modules.OpenProfile
             Hashtable ReqHash = new Hashtable();
 
             string serverURI = string.Empty;
-            bool foreign = GetUserProfileServerURI(remoteClient.AgentId, out serverURI);
+            GetUserProfileServerURI(remoteClient.AgentId, out serverURI);
 
             ReqHash["classifiedID"] = queryClassifiedID.ToString();
 
@@ -378,7 +378,7 @@ namespace OpenSimProfile.Modules.OpenProfile
             }
 
             string serverURI = string.Empty;
-            bool foreign = GetUserProfileServerURI(targetID, out serverURI);
+            GetUserProfileServerURI(targetID, out serverURI);
 
             Hashtable ReqHash = new Hashtable();
             ReqHash["uuid"] = args[0];
@@ -426,7 +426,7 @@ namespace OpenSimProfile.Modules.OpenProfile
             UUID.TryParse(args[0], out targetID);
 
             string serverURI = string.Empty;
-            bool foreign = GetUserProfileServerURI(targetID, out serverURI);
+            GetUserProfileServerURI(targetID, out serverURI);
 
             ReqHash["avatar_id"] = args[0];
             ReqHash["pick_id"] = args[1];
@@ -491,8 +491,8 @@ namespace OpenSimProfile.Modules.OpenProfile
             ReqHash["parcel_uuid"] = p.currentParcelUUID.ToString();
 
             // Getting the global position for the Avatar
-            Vector3 posGlobal = new Vector3(remoteClient.Scene.RegionInfo.RegionLocX*Constants.RegionSize + avaPos.X,
-                                            remoteClient.Scene.RegionInfo.RegionLocY*Constants.RegionSize + avaPos.Y,
+            Vector3 posGlobal = new Vector3(remoteClient.Scene.RegionInfo.RegionLocX * Constants.RegionSize + avaPos.X,
+                                            remoteClient.Scene.RegionInfo.RegionLocY * Constants.RegionSize + avaPos.Y,
                                             avaPos.Z);
 
             ReqHash["pos_global"] = posGlobal.ToString();
@@ -501,7 +501,7 @@ namespace OpenSimProfile.Modules.OpenProfile
             ReqHash["user"] = "";   //FIXME: Get avatar/group who owns parcel
 
             string serverURI = string.Empty;
-            bool foreign = GetUserProfileServerURI(remoteClient.AgentId, out serverURI);
+            GetUserProfileServerURI(remoteClient.AgentId, out serverURI);
 
             // Do the request
             Hashtable result = GenericXMLRPCRequest(ReqHash,
@@ -522,7 +522,7 @@ namespace OpenSimProfile.Modules.OpenProfile
             ReqHash["pick_id"] = queryPickID.ToString();
 
             string serverURI = string.Empty;
-            bool foreign = GetUserProfileServerURI(remoteClient.AgentId, out serverURI);
+            GetUserProfileServerURI(remoteClient.AgentId, out serverURI);
 
             Hashtable result = GenericXMLRPCRequest(ReqHash,
                     "picks_delete", serverURI);
@@ -551,7 +551,7 @@ namespace OpenSimProfile.Modules.OpenProfile
             ReqHash["uuid"] = args[0];
 
             string serverURI = string.Empty;
-            bool foreign = GetUserProfileServerURI(remoteClient.AgentId, out serverURI);
+            GetUserProfileServerURI(remoteClient.AgentId, out serverURI);
 
             Hashtable result = GenericXMLRPCRequest(ReqHash,
                     method, serverURI);
@@ -587,7 +587,7 @@ namespace OpenSimProfile.Modules.OpenProfile
             ReqHash["notes"] = queryNotes;
 
             string serverURI = string.Empty;
-            bool foreign = GetUserProfileServerURI(remoteClient.AgentId, out serverURI);
+            GetUserProfileServerURI(remoteClient.AgentId, out serverURI);
 
             Hashtable result = GenericXMLRPCRequest(ReqHash,
                     "avatar_notes_update", serverURI);
@@ -612,7 +612,7 @@ namespace OpenSimProfile.Modules.OpenProfile
             ReqHash["languages"] = languages;
 
             string serverURI = string.Empty;
-            bool foreign = GetUserProfileServerURI(remoteClient.AgentId, out serverURI);
+            GetUserProfileServerURI(remoteClient.AgentId, out serverURI);
 
             Hashtable result = GenericXMLRPCRequest(ReqHash,
                     "avatar_interests_update", serverURI);
@@ -631,7 +631,7 @@ namespace OpenSimProfile.Modules.OpenProfile
             ReqHash["avatar_id"] = remoteClient.AgentId.ToString();
 
             string serverURI = string.Empty;
-            bool foreign = GetUserProfileServerURI(remoteClient.AgentId, out serverURI);
+            GetUserProfileServerURI(remoteClient.AgentId, out serverURI);
 
             Hashtable result = GenericXMLRPCRequest(ReqHash,
                     "user_preferences_request", serverURI);
@@ -669,7 +669,7 @@ namespace OpenSimProfile.Modules.OpenProfile
             ReqHash["visible"] = visible.ToString();
 
             string serverURI = string.Empty;
-            bool foreign = GetUserProfileServerURI(remoteClient.AgentId, out serverURI);
+            GetUserProfileServerURI(remoteClient.AgentId, out serverURI);
 
             Hashtable result = GenericXMLRPCRequest(ReqHash,
                     "user_preferences_update", serverURI);
@@ -703,7 +703,7 @@ namespace OpenSimProfile.Modules.OpenProfile
             ReqHash["avatar_id"] = userID.ToString();
 
             string serverURI = string.Empty;
-            bool foreign = GetUserProfileServerURI(userID, out serverURI);
+            GetUserProfileServerURI(userID, out serverURI);
 
             // This is checking a friend on the home grid
             // Not HG friend
@@ -877,7 +877,7 @@ namespace OpenSimProfile.Modules.OpenProfile
                 ReqHash["FirstLifeAboutText"] = newProfile.FirstLifeAboutText;
 
                 string serverURI = string.Empty;
-                bool foreign = GetUserProfileServerURI(remoteClient.AgentId, out serverURI);
+                GetUserProfileServerURI(remoteClient.AgentId, out serverURI);
 
                 Hashtable result = GenericXMLRPCRequest(ReqHash,
                         "avatar_properties_update", serverURI);
