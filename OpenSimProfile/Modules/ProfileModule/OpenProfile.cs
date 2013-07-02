@@ -351,7 +351,7 @@ namespace OpenSimProfile.Modules.OpenProfile
             if (money != null && Convert.ToBoolean(result["created"]))
             {
                 money.ApplyCharge(remoteClient.AgentId, queryclassifiedPrice,
-                                  "Classified ad created: " + queryName);
+                                  MoneyTransactionType.ClassifiedCharge);
             }
         }
 
