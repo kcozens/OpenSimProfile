@@ -80,9 +80,6 @@ namespace OpenSimProfile.Modules.OpenProfile
             if (!m_Enabled)
                 return;
 
-            // Hook up events
-            scene.EventManager.OnNewClient += OnNewClient;
-
             // Take ownership of the IProfileModule service
             scene.RegisterModuleInterface<IProfileModule>(this);
 
@@ -99,11 +96,17 @@ namespace OpenSimProfile.Modules.OpenProfile
                 return;
 
             scene.UnregisterModuleInterface<IProfileModule>(this);
-            m_Scenes.Remove(scene);
+
+            lock(m_Scenes)
+            {
+                m_Scenes.Remove(scene);
+            }
         }
 
         public void RegionLoaded(Scene scene)
         {
+            // Hook up events
+            scene.EventManager.OnNewClient += OnNewClient;
         }
 
         public Type ReplaceableInterface

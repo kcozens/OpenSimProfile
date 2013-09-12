@@ -138,7 +138,7 @@ function classified_update($method_name, $params, $app_data)
             "'". mysql_real_escape_string($snapshotuuid) ."',".
             "'". mysql_real_escape_string($simname) ."',".
             "'". mysql_real_escape_string($globalpos) ."',".
-            "'". $parcelname ."',".
+            "'". mysql_real_escape_string($parcelname) ."',".
             "". mysql_real_escape_string($classifiedflag) .",".
             "". mysql_real_escape_string($priceforlist) .")";
     }
@@ -155,7 +155,7 @@ function classified_update($method_name, $params, $app_data)
             "`snapshotuuid`='". mysql_real_escape_string($snapshotuuid)."',".
             "`simname`='". mysql_real_escape_string($simname)."',".
             "`posglobal`='". mysql_real_escape_string($globalpos)."',".
-            "`parcelname`='". $parcelname."',".
+            "`parcelname`='". mysql_real_escape_string($parcelname)."',".
             "`classifiedflags`=". mysql_real_escape_string($classifiedflag).",".
             "`priceforlisting`=". mysql_real_escape_string($priceforlist).
             " WHERE ".
