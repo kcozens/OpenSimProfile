@@ -15,14 +15,14 @@ CREATE TABLE IF NOT EXISTS `classifieds` (
   `classifiedflags` int(8) NOT NULL,
   `priceforlisting` int(5) NOT NULL,
   PRIMARY KEY (`classifieduuid`)
-) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 CREATE TABLE IF NOT EXISTS `usernotes` (
   `useruuid` varchar(36) NOT NULL,
   `targetuuid` varchar(36) NOT NULL,
   `notes` text NOT NULL,
   UNIQUE KEY `useruuid` (`useruuid`,`targetuuid`)
-) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 CREATE TABLE IF NOT EXISTS `userpicks` (
   `pickuuid` varchar(36) NOT NULL,
@@ -39,7 +39,7 @@ CREATE TABLE IF NOT EXISTS `userpicks` (
   `sortorder` int(2) NOT NULL,
   `enabled` enum('true','false') NOT NULL,
   PRIMARY KEY (`pickuuid`)
-) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 CREATE TABLE IF NOT EXISTS `userprofile` (
   `useruuid` varchar(36) NOT NULL,
@@ -57,7 +57,7 @@ CREATE TABLE IF NOT EXISTS `userprofile` (
   `profileFirstImage` varchar(36) NOT NULL,
   `profileFirstText` text NOT NULL,
   PRIMARY KEY (`useruuid`)
-) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 CREATE TABLE IF NOT EXISTS `usersettings` (
   `useruuid` varchar(36) NOT NULL,
@@ -65,4 +65,4 @@ CREATE TABLE IF NOT EXISTS `usersettings` (
   `visible` enum('true','false') NOT NULL,
   `email` varchar(254) NOT NULL,
   PRIMARY KEY (`useruuid`)
-) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
