@@ -127,7 +127,7 @@ namespace OpenSimProfile.Modules.OpenProfile
 
         public string Name
         {
-            get { return "ProfileModule"; }
+            get { return "OpenSimProfile"; }
         }
         #endregion
 
