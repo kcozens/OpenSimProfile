@@ -257,7 +257,7 @@ namespace OpenSimProfile.Modules.OpenProfile
                     return;
             }
 
-            string serverURI = string.Empty;
+            string serverURI = String.Empty;
             GetUserProfileServerURI(targetID, out serverURI);
 
             Hashtable ReqHash = new Hashtable();
@@ -318,7 +318,7 @@ namespace OpenSimProfile.Modules.OpenProfile
             ScenePresence p = FindPresence(remoteClient.AgentId);
 
 
-            string serverURI = string.Empty;
+            string serverURI = String.Empty;
             GetUserProfileServerURI(remoteClient.AgentId, out serverURI);
 
             Vector3 avaPos = p.AbsolutePosition;
@@ -367,7 +367,7 @@ namespace OpenSimProfile.Modules.OpenProfile
         {
             Hashtable ReqHash = new Hashtable();
 
-            string serverURI = string.Empty;
+            string serverURI = String.Empty;
             GetUserProfileServerURI(remoteClient.AgentId, out serverURI);
 
             ReqHash["classifiedID"] = queryClassifiedID.ToString();
@@ -402,7 +402,7 @@ namespace OpenSimProfile.Modules.OpenProfile
                     return;
             }
 
-            string serverURI = string.Empty;
+            string serverURI = String.Empty;
             GetUserProfileServerURI(targetID, out serverURI);
 
             Hashtable ReqHash = new Hashtable();
@@ -451,7 +451,7 @@ namespace OpenSimProfile.Modules.OpenProfile
             UUID targetID;
             UUID.TryParse(args[0], out targetID);
 
-            string serverURI = string.Empty;
+            string serverURI = String.Empty;
             GetUserProfileServerURI(targetID, out serverURI);
 
             ReqHash["avatar_id"] = args[0];
@@ -532,7 +532,7 @@ namespace OpenSimProfile.Modules.OpenProfile
             // Getting the owner of the parcel
             ReqHash["user"] = "";   //FIXME: Get avatar/group who owns parcel
 
-            string serverURI = string.Empty;
+            string serverURI = String.Empty;
             GetUserProfileServerURI(remoteClient.AgentId, out serverURI);
 
             // Do the request
@@ -553,7 +553,7 @@ namespace OpenSimProfile.Modules.OpenProfile
 
             ReqHash["pick_id"] = queryPickID.ToString();
 
-            string serverURI = string.Empty;
+            string serverURI = String.Empty;
             GetUserProfileServerURI(remoteClient.AgentId, out serverURI);
 
             Hashtable result = GenericXMLRPCRequest(ReqHash,
@@ -582,7 +582,7 @@ namespace OpenSimProfile.Modules.OpenProfile
             ReqHash["avatar_id"] = remoteClient.AgentId.ToString();
             ReqHash["uuid"] = args[0];
 
-            string serverURI = string.Empty;
+            string serverURI = String.Empty;
             GetUserProfileServerURI(remoteClient.AgentId, out serverURI);
 
             Hashtable result = GenericXMLRPCRequest(ReqHash,
@@ -618,7 +618,7 @@ namespace OpenSimProfile.Modules.OpenProfile
             ReqHash["target_id"] = queryTargetID.ToString();
             ReqHash["notes"] = queryNotes;
 
-            string serverURI = string.Empty;
+            string serverURI = String.Empty;
             GetUserProfileServerURI(remoteClient.AgentId, out serverURI);
 
             Hashtable result = GenericXMLRPCRequest(ReqHash,
@@ -643,7 +643,7 @@ namespace OpenSimProfile.Modules.OpenProfile
             ReqHash["skillstext"] = skillstext;
             ReqHash["languages"] = languages;
 
-            string serverURI = string.Empty;
+            string serverURI = String.Empty;
             GetUserProfileServerURI(remoteClient.AgentId, out serverURI);
 
             Hashtable result = GenericXMLRPCRequest(ReqHash,
@@ -662,7 +662,7 @@ namespace OpenSimProfile.Modules.OpenProfile
 
             ReqHash["avatar_id"] = remoteClient.AgentId.ToString();
 
-            string serverURI = string.Empty;
+            string serverURI = String.Empty;
             GetUserProfileServerURI(remoteClient.AgentId, out serverURI);
 
             Hashtable result = GenericXMLRPCRequest(ReqHash,
@@ -700,7 +700,7 @@ namespace OpenSimProfile.Modules.OpenProfile
             ReqHash["imViaEmail"] = imViaEmail.ToString();
             ReqHash["visible"] = visible.ToString();
 
-            string serverURI = string.Empty;
+            string serverURI = String.Empty;
             GetUserProfileServerURI(remoteClient.AgentId, out serverURI);
 
             Hashtable result = GenericXMLRPCRequest(ReqHash,
@@ -734,7 +734,7 @@ namespace OpenSimProfile.Modules.OpenProfile
 
             ReqHash["avatar_id"] = userID.ToString();
 
-            string serverURI = string.Empty;
+            string serverURI = String.Empty;
             GetUserProfileServerURI(userID, out serverURI);
 
             // This is checking a friend on the home grid
@@ -786,7 +786,7 @@ namespace OpenSimProfile.Modules.OpenProfile
 
             Scene scene = (Scene)s;
 
-            string serverURI = string.Empty;
+            string serverURI = String.Empty;
             bool foreign = GetUserProfileServerURI(avatarID, out serverURI);
 
             UserAccount account = null;
@@ -844,7 +844,7 @@ namespace OpenSimProfile.Modules.OpenProfile
             }
 
             Hashtable profileData = GetProfileData(avatarID);
-            string profileUrl = string.Empty;
+            string profileUrl = String.Empty;
             string aboutText = String.Empty;
             string firstLifeAboutText = String.Empty;
             UUID image = UUID.Zero;
@@ -908,7 +908,7 @@ namespace OpenSimProfile.Modules.OpenProfile
                 ReqHash["FirstLifeImage"] = newProfile.FirstLifeImage.ToString();
                 ReqHash["FirstLifeAboutText"] = newProfile.FirstLifeAboutText;
 
-                string serverURI = string.Empty;
+                string serverURI = String.Empty;
                 GetUserProfileServerURI(remoteClient.AgentId, out serverURI);
 
                 Hashtable result = GenericXMLRPCRequest(ReqHash,
