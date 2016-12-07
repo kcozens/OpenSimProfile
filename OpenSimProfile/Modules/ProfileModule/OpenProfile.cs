@@ -251,10 +251,10 @@ namespace OpenSimProfile.Modules.OpenProfile
             // Can't handle NPC yet...
             ScenePresence p = FindPresence(targetID);
 
-            if (null != p)
+            if (null != p && p.PresenceType == PresenceType.Npc)
             {
-                if (p.PresenceType == PresenceType.Npc)
-                    return;
+                remoteClient.SendAvatarClassifiedReply(new UUID(args[0]), new Dictionary<UUID, string>());
+                return;
             }
 
             string serverURI = String.Empty;
@@ -396,10 +396,10 @@ namespace OpenSimProfile.Modules.OpenProfile
             // Can't handle NPC yet...
             ScenePresence p = FindPresence(targetID);
 
-            if (null != p)
+            if (null != p && p.PresenceType == PresenceType.Npc)
             {
-                if (p.PresenceType == PresenceType.Npc)
-                    return;
+                remoteClient.SendAvatarPicksReply(new UUID(args[0]), new Dictionary<UUID, string>());
+                return;
             }
 
             string serverURI = String.Empty;
@@ -612,6 +612,14 @@ namespace OpenSimProfile.Modules.OpenProfile
         // Notes Update
         public void AvatarNotesUpdate(IClientAPI remoteClient, UUID queryTargetID, string queryNotes)
         {
+            ScenePresence p = FindPresence(queryTargetID);
+            if (p != null && p.isNPC)
+            {
+                remoteClient.SendAgentAlertMessage(
+                        "Notes for NPCs not available", false);
+                return;
+            }
+
             Hashtable ReqHash = new Hashtable();
 
             ReqHash["avatar_id"] = remoteClient.AgentId.ToString();
@@ -721,17 +729,6 @@ namespace OpenSimProfile.Modules.OpenProfile
             // Can't handle NPC yet...
             ScenePresence p = FindPresence(userID);
 
-            if (null != p)
-            {
-                if (p.PresenceType == PresenceType.Npc)
-                {
-                    Hashtable npc =new Hashtable();
-                    npc["success"] = "false";
-                    npc["errorMessage"] = "Presence is NPC. ";
-                    return npc;
-                }
-            }
-
             ReqHash["avatar_id"] = userID.ToString();
 
             string serverURI = String.Empty;
@@ -774,10 +771,17 @@ namespace OpenSimProfile.Modules.OpenProfile
             // Can't handle NPC yet...
             ScenePresence p = FindPresence(avatarID);
 
-            if (null != p)
+            if (null != p && p.PresenceType == PresenceType.Npc)
             {
-                if (p.PresenceType == PresenceType.Npc)
-                    return;
+                remoteClient.SendAvatarProperties(avatarID,
+                                  ((INPC)(p.ControllingClient)).profileAbout,
+                                  "5/25/1977",
+                                  Utils.StringToBytes("Non Player Character"),
+                                  "NPCs have no life.", 16,
+                                  UUID.Zero, UUID.Zero, String.Empty, UUID.Zero);
+                remoteClient.SendAvatarInterestsReply(avatarID, 0, String.Empty,
+                                  0, String.Empty, String.Empty);
+                return;
             }
 
             IScene s = remoteClient.Scene;
