@@ -17,7 +17,7 @@ using OpenSim.Services.Interfaces;
 using Mono.Addins;
 using OpenSim.Services.Connectors.Hypergrid;
 
-[assembly: Addin("OpenSimProfile", OpenSim.VersionInfo.VersionNumber + "0.4")]
+[assembly: Addin("OpenSimProfile", OpenSim.VersionInfo.VersionNumber + "0.5")]
 [assembly: AddinDependency("OpenSim.Region.Framework", OpenSim.VersionInfo.VersionNumber)]
 [assembly: AddinDescription("OpenSimProfile module.")]
 [assembly: AddinAuthor("Unknown")]
