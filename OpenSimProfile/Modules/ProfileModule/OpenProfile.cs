@@ -775,7 +775,7 @@ namespace OpenSimProfile.Modules.OpenProfile
             {
                 remoteClient.SendAvatarProperties(avatarID,
                                   ((INPC)(p.ControllingClient)).profileAbout,
-                                  "5/25/1977",
+                                  ((INPC)(p.ControllingClient)).Born,
                                   Utils.StringToBytes("Non Player Character"),
                                   "NPCs have no life.", 16,
                                   UUID.Zero, UUID.Zero, String.Empty, UUID.Zero);
