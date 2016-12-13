@@ -805,7 +805,7 @@ namespace OpenSimProfile.Modules.OpenProfile
                 userInfo = new Dictionary<string, object>();
             }
 
-            Byte[] charterMember = new Byte[1];
+            Byte[] membershipType = new Byte[1];
             string born = String.Empty;
             uint flags = 0x00;
 
@@ -813,11 +813,11 @@ namespace OpenSimProfile.Modules.OpenProfile
             {
                 if (account.UserTitle == "")
                 {
-                    charterMember[0] = (Byte)((account.UserFlags & 0xf00) >> 8);
+                    membershipType[0] = (Byte)((account.UserFlags & 0xf00) >> 8);
                 }
                 else
                 {
-                    charterMember = Utils.StringToBytes(account.UserTitle);
+                    membershipType = Utils.StringToBytes(account.UserTitle);
                 }
 
                 born = Util.ToDateTime(account.Created).ToString(
@@ -830,11 +830,11 @@ namespace OpenSimProfile.Modules.OpenProfile
                 {
                     if ((string)userInfo["user_title"] == "")
                     {
-                        charterMember[0] = (Byte)(((Byte)userInfo["user_flags"] & 0xf00) >> 8);
+                        membershipType[0] = (Byte)(((Byte)userInfo["user_flags"] & 0xf00) >> 8);
                     }
                     else
                     {
-                        charterMember = Utils.StringToBytes((string)userInfo["user_title"]);
+                        membershipType = Utils.StringToBytes((string)userInfo["user_title"]);
                     }
 
                     int val_born = (int)userInfo["user_created"];
@@ -877,7 +877,7 @@ namespace OpenSimProfile.Modules.OpenProfile
             // account. It now needs to be taken from the XMLRPC
             //
             remoteClient.SendAvatarProperties(avatarID, aboutText,born,
-                              charterMember, firstLifeAboutText, flags,
+                              membershipType, firstLifeAboutText, flags,
                               firstLifeImage, image, profileUrl, partner);
 
             //Viewer expects interest data when it asks for properties.
