@@ -726,9 +726,6 @@ namespace OpenSimProfile.Modules.OpenProfile
         {
             Hashtable ReqHash = new Hashtable();
 
-            // Can't handle NPC yet...
-            ScenePresence p = FindPresence(userID);
-
             ReqHash["avatar_id"] = userID.ToString();
 
             string serverURI = String.Empty;
