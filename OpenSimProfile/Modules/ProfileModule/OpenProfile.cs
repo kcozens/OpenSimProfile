@@ -774,7 +774,7 @@ namespace OpenSimProfile.Modules.OpenProfile
                                   ((INPC)(p.ControllingClient)).profileAbout,
                                   ((INPC)(p.ControllingClient)).Born,
                                   Utils.StringToBytes("Non Player Character"),
-                                  "NPCs have no life.", 16, UUID.Zero,
+                                  "NPCs have no life.", 0x10, UUID.Zero,
                                   ((INPC)(p.ControllingClient)).profileImage,
                                   String.Empty, UUID.Zero);
                 remoteClient.SendAvatarInterestsReply(avatarID, 0, String.Empty,
@@ -870,6 +870,10 @@ namespace OpenSimProfile.Modules.OpenProfile
                 firstLifeImage = new UUID(profileData["FirstLifeImage"].ToString());
             if (profileData["Partner"] != null)
                 partner = new UUID(profileData["Partner"].ToString());
+
+            // If on same region force online
+            if (p != null && !p.IsDeleted)
+                flags |= 0x10;
 
             // The PROFILE information is no longer stored in the user
             // account. It now needs to be taken from the XMLRPC
