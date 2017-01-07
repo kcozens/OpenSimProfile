@@ -613,7 +613,7 @@ namespace OpenSimProfile.Modules.OpenProfile
         public void AvatarNotesUpdate(IClientAPI remoteClient, UUID queryTargetID, string queryNotes)
         {
             ScenePresence p = FindPresence(queryTargetID);
-            if (p != null && p.isNPC)
+            if (p != null && p.IsNPC)
             {
                 remoteClient.SendAgentAlertMessage(
                         "Notes for NPCs not available", false);
