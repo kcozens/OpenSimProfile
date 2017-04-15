@@ -2,7 +2,8 @@ OpenSimProfile add-on module for Open Simulator
 
 Requirements
 
-A webserver with PHP 4.3 (or later) support.
+A webserver with PHP 4.3 (or later) and with XMLRPC support.
+NOTE: Not all webservers include XMLRPC support in their default installation.
 
 
 About the files
