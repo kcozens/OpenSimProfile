@@ -100,6 +100,8 @@ namespace OpenSimProfile.Modules.OpenProfile
 
             scene.UnregisterModuleInterface<IProfileModule>(this);
 
+            scene.EventManager.OnNewClient -= OnNewClient;
+
             lock(m_Scenes)
             {
                 m_Scenes.Remove(scene);
@@ -108,6 +110,9 @@ namespace OpenSimProfile.Modules.OpenProfile
 
         public void RegionLoaded(Scene scene)
         {
+            if (!m_Enabled)
+                return;
+
             // Hook up events
             scene.EventManager.OnNewClient += OnNewClient;
         }
