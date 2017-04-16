@@ -1,9 +1,12 @@
 <?php
+include("databaseinfo.php");
 
-define("C_DB_HOST"      ,"localhost");
-define("C_DB_DATABASE"  ,"");
-define("C_DB_USER"      ,"");
-define("C_DB_PASS"      ,"");
+$link = mysqli_connect ($DB_HOST, $DB_USER, $DB_PASSWORD);
+if (!$link)
+    die('Connect error (' . mysqli_connect_errno() . ') ' . mysqli_connect_error());
+
+mysqli_select_db ($link,$DB_NAME);
+mysqli_set_charset($link, "utf8");
 
 #
 #  Copyright (c)Melanie Thielker (http://opensimulator.org/)
@@ -14,36 +17,24 @@ define("C_DB_PASS"      ,"");
 
 $zeroUUID = "00000000-0000-0000-0000-000000000000";
 
-#---------------------
+#
 # The XMLRPC server object
+#
+
 $xmlrpc_server = xmlrpc_server_create();
 
-#---------------------
-# Database functions
-function openDB($dbHost,$dbUser,$dbPassword,$dbName)
-{
-    /*Open database*/
-    $link = mysqli_connect($dbHost,$dbUser,$dbPassword,$dbName);
-    if (!$link) { die('Connect Error (' . mysqli_connect_errno() . ') '. mysqli_connect_error()); exit; }
-    mysqli_set_charset($link, "utf8");
+#
+# Classifieds
+#
 
-    return $link;
-}
-
-#---------------------
-function closeDB($link)
-{
-    /*Close database*/
-    mysqli_close($link);
-}
-
-#---------------------
 # Avatar Classifieds Request
-xmlrpc_server_register_method($xmlrpc_server, "avatarclassifiedsrequest","avatarclassifiedsrequest");
+
+xmlrpc_server_register_method($xmlrpc_server, "avatarclassifiedsrequest",
+        "avatarclassifiedsrequest");
+
 function avatarclassifiedsrequest($method_name, $params, $app_data)
 {
-    $link=openDB(C_DB_HOST, C_DB_USER, C_DB_PASS, C_DB_DATABASE);
-
+    global $link;
 
     $req            = $params[0];
 
@@ -68,17 +59,16 @@ function avatarclassifiedsrequest($method_name, $params, $app_data)
     ));
 
     print $response_xml;
-    closeDB($link);
 }
 
-#---------------------
 # Classifieds Update
-xmlrpc_server_register_method($xmlrpc_server, "classified_update","classified_update");
+
+xmlrpc_server_register_method($xmlrpc_server, "classified_update",
+        "classified_update");
+
 function classified_update($method_name, $params, $app_data)
 {
-    $link=openDB(C_DB_HOST, C_DB_USER, C_DB_PASS, C_DB_DATABASE);
-
-    global $zeroUUID;
+    global $link, $zeroUUID;
 
     $req            = $params[0];
 
@@ -151,7 +141,7 @@ function classified_update($method_name, $params, $app_data)
             "'". mysqli_real_escape_string($link,$snapshotuuid) ."',".
             "'". mysqli_real_escape_string($link,$simname) ."',".
             "'". mysqli_real_escape_string($link,$globalpos) ."',".
-            "'". $parcelname ."',".
+            "'". mysqli_real_escape_string($link,$parcelname) ."',".
             "". mysqli_real_escape_string($link,$classifiedflag) .",".
             "". mysqli_real_escape_string($link,$priceforlist) .")";
     }
@@ -168,7 +158,7 @@ function classified_update($method_name, $params, $app_data)
             "`snapshotuuid`='". mysqli_real_escape_string($link,$snapshotuuid)."',".
             "`simname`='". mysqli_real_escape_string($link,$simname)."',".
             "`posglobal`='". mysqli_real_escape_string($link,$globalpos)."',".
-            "`parcelname`='". $parcelname."',".
+            "`parcelname`='". mysqli_real_escape_string($link,$parcelname)."',".
             "`classifiedflags`=". mysqli_real_escape_string($link,$classifiedflag).",".
             "`priceforlisting`=". mysqli_real_escape_string($link,$priceforlist).
             " WHERE ".
@@ -185,15 +175,16 @@ function classified_update($method_name, $params, $app_data)
     ));
 
     print $response_xml;
-    closeDB($link);
 }
 
-#---------------------
 # Classifieds Delete
-xmlrpc_server_register_method($xmlrpc_server, "classified_delete","classified_delete");
+
+xmlrpc_server_register_method($xmlrpc_server, "classified_delete",
+        "classified_delete");
+
 function classified_delete($method_name, $params, $app_data)
 {
-    $link=openDB(C_DB_HOST, C_DB_USER, C_DB_PASS, C_DB_DATABASE);
+    global $link;
 
     $req            = $params[0];
 
@@ -208,15 +199,20 @@ function classified_delete($method_name, $params, $app_data)
     ));
 
     print $response_xml;
-    closeDB($link);
 }
 
-#---------------------
+#
+# Picks
+#
+
 # Avatar Picks Request
-xmlrpc_server_register_method($xmlrpc_server, "avatarpicksrequest","avatarpicksrequest");
+
+xmlrpc_server_register_method($xmlrpc_server, "avatarpicksrequest",
+        "avatarpicksrequest");
+
 function avatarpicksrequest($method_name, $params, $app_data)
 {
-    $link=openDB(C_DB_HOST, C_DB_USER, C_DB_PASS, C_DB_DATABASE);
+    global $link;
 
     $req            = $params[0];
 
@@ -240,15 +236,16 @@ function avatarpicksrequest($method_name, $params, $app_data)
     ));
 
     print $response_xml;
-    closeDB($link);
 }
 
-#---------------------
 # Request Picks for User
-xmlrpc_server_register_method($xmlrpc_server, "pickinforequest","pickinforequest");
+
+xmlrpc_server_register_method($xmlrpc_server, "pickinforequest",
+        "pickinforequest");
+
 function pickinforequest($method_name, $params, $app_data)
 {
-    $link=openDB(C_DB_HOST, C_DB_USER, C_DB_PASS, C_DB_DATABASE);
+    global $link;
 
     $req            = $params[0];
 
@@ -289,18 +286,16 @@ function pickinforequest($method_name, $params, $app_data)
     ));
 
     print $response_xml;
-    closeDB($link);
 }
 
-#---------------------
 # Picks Update
-xmlrpc_server_register_method($xmlrpc_server, "picks_update","picks_update");
+
+xmlrpc_server_register_method($xmlrpc_server, "picks_update",
+        "picks_update");
+
 function picks_update($method_name, $params, $app_data)
 {
-    $link=openDB(C_DB_HOST, C_DB_USER, C_DB_PASS, C_DB_DATABASE);
-
-
-    global $zeroUUID;
+    global $link, $zeroUUID;
 
     $req            = $params[0];
 
@@ -373,15 +368,16 @@ function picks_update($method_name, $params, $app_data)
     ));
 
     print $response_xml;
-    closeDB($link);
 }
 
-#---------------------
 # Picks Delete
-xmlrpc_server_register_method($xmlrpc_server, "picks_delete","picks_delete");
+
+xmlrpc_server_register_method($xmlrpc_server, "picks_delete",
+        "picks_delete");
+
 function picks_delete($method_name, $params, $app_data)
 {
-    $link=openDB(C_DB_HOST, C_DB_USER, C_DB_PASS, C_DB_DATABASE);
+    global $link;
 
     $req            = $params[0];
 
@@ -399,15 +395,21 @@ function picks_delete($method_name, $params, $app_data)
     ));
 
     print $response_xml;
-    closeDB($link);
 }
 
-#---------------------
+#
+# Notes
+#
+
 # Avatar Notes Request
-xmlrpc_server_register_method($xmlrpc_server, "avatarnotesrequest","avatarnotesrequest");
+
+
+xmlrpc_server_register_method($xmlrpc_server, "avatarnotesrequest",
+        "avatarnotesrequest");
+
 function avatarnotesrequest($method_name, $params, $app_data)
 {
-    $link=openDB(C_DB_HOST, C_DB_USER, C_DB_PASS, C_DB_DATABASE);
+    global $link;
 
     $req            = $params[0];
 
@@ -434,15 +436,16 @@ function avatarnotesrequest($method_name, $params, $app_data)
     ));
 
     print $response_xml;
-    closeDB($link);
 }
 
-#---------------------
 # Avatar Notes Update
-xmlrpc_server_register_method($xmlrpc_server, "avatar_notes_update","avatar_notes_update");
+
+xmlrpc_server_register_method($xmlrpc_server, "avatar_notes_update",
+        "avatar_notes_update");
+
 function avatar_notes_update($method_name, $params, $app_data)
 {
-    $link=openDB(C_DB_HOST, C_DB_USER, C_DB_PASS, C_DB_DATABASE);
+    global $link;
 
     $req            = $params[0];
 
@@ -487,17 +490,16 @@ function avatar_notes_update($method_name, $params, $app_data)
     ));
 
     print $response_xml;
-    closeDB($link);
 }
 
-#---------------------
-# Avatar Properties Request
-xmlrpc_server_register_method($xmlrpc_server, "avatar_properties_request","avatar_properties_request");
+# Profile bits
+
+xmlrpc_server_register_method($xmlrpc_server, "avatar_properties_request",
+        "avatar_properties_request");
+
 function avatar_properties_request($method_name, $params, $app_data)
 {
-    $link=openDB(C_DB_HOST, C_DB_USER, C_DB_PASS, C_DB_DATABASE);
-
-    global $zeroUUID;
+    global $link, $zeroUUID;
 
     $req            = $params[0];
 
@@ -555,15 +557,14 @@ function avatar_properties_request($method_name, $params, $app_data)
     ));
 
     print $response_xml;
-    closeDB($link);
 }
 
-#---------------------
-# Avatar Properties Update
-xmlrpc_server_register_method($xmlrpc_server, "avatar_properties_update","avatar_properties_update");
+xmlrpc_server_register_method($xmlrpc_server, "avatar_properties_update",
+        "avatar_properties_update");
+
 function avatar_properties_update($method_name, $params, $app_data)
 {
-    $link=openDB(C_DB_HOST, C_DB_USER, C_DB_PASS, C_DB_DATABASE);
+    global $link;
 
     $req            = $params[0];
 
@@ -589,16 +590,17 @@ function avatar_properties_update($method_name, $params, $app_data)
     ));
 
     print $response_xml;
-    closeDB($link);
 }
 
 
-#---------------------
-# Profile Interests
-xmlrpc_server_register_method($xmlrpc_server, "avatar_interests_update","avatar_interests_update");
+// Profile Interests
+
+xmlrpc_server_register_method($xmlrpc_server, "avatar_interests_update",
+        "avatar_interests_update");
+
 function avatar_interests_update($method_name, $params, $app_data)
 {
-    $link=openDB(C_DB_HOST, C_DB_USER, C_DB_PASS, C_DB_DATABASE);
+    global $link;
 
     $req            = $params[0];
 
@@ -623,15 +625,16 @@ function avatar_interests_update($method_name, $params, $app_data)
     ));
 
     print $response_xml;
-    closeDB($link);
 }
 
-#---------------------
-# User Preferences Request
-xmlrpc_server_register_method($xmlrpc_server, "user_preferences_request","user_preferences_request");
+// User Preferences
+
+xmlrpc_server_register_method($xmlrpc_server, "user_preferences_request",
+        "user_preferences_request");
+
 function user_preferences_request($method_name, $params, $app_data)
 {
-    $link=openDB(C_DB_HOST, C_DB_USER, C_DB_PASS, C_DB_DATABASE);
+    global $link;
 
     $req            = $params[0];
 
@@ -670,15 +673,14 @@ function user_preferences_request($method_name, $params, $app_data)
     ));
 
     print $response_xml;
-    closeDB($link);
 }
 
-#---------------------
-# User Preferences Update
-xmlrpc_server_register_method($xmlrpc_server, "user_preferences_update","user_preferences_update");
+xmlrpc_server_register_method($xmlrpc_server, "user_preferences_update",
+        "user_preferences_update");
+
 function user_preferences_update($method_name, $params, $app_data)
 {
-    $link=openDB(C_DB_HOST, C_DB_USER, C_DB_PASS, C_DB_DATABASE);
+    global $link;
 
     $req            = $params[0];
 
@@ -697,15 +699,17 @@ function user_preferences_update($method_name, $params, $app_data)
     ));
 
     print $response_xml;
-    closeDB($link);
 }
 
 
-#---------------------
+#
 # Process the request
+#
 
 $request_xml = file_get_contents("php://input");
 
 xmlrpc_server_call_method($xmlrpc_server, $request_xml, '');
 xmlrpc_server_destroy($xmlrpc_server);
+
+mysqli_close($link);
 ?>
