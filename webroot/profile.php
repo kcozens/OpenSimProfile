@@ -334,7 +334,7 @@ function picks_update($method_name, $params, $app_data)
 
     // Check if we already have this one in the database
     $query = $db->prepare("SELECT COUNT(*) FROM userpicks WHERE pickuuid = ?");
-    $query->execute( array($pick) );
+    $query->execute( array($pickuuid) );
 
     if ($query->fetchColumn() == 0)
     {
@@ -367,7 +367,11 @@ function picks_update($method_name, $params, $app_data)
     else
     {
         $query = $db->prepare("UPDATE userpicks SET " .
-                                ":parcel, :name, :desc, :snapshot, :pick");
+                                "parceluuid = :parcel, " .
+                                "name = :name,  " .
+                                "description = :desc,  " .
+                                "snapshotuuid = :snapshot " .
+                                "WHERE pickuuid = :pick");
         $result = $query->execute( array("parcel"   => $parceluuid,
                                          "name"     => $name,
                                          "desc"     => $description,
@@ -381,9 +385,8 @@ function picks_update($method_name, $params, $app_data)
         $result = False;
 
     $response_xml = xmlrpc_encode(array(
-        'success' => $result,
-        'errorMessage' => $db->errorInfo())
-    );
+        'success' => $result
+    ));
 
     print $response_xml;
 }
@@ -729,7 +732,6 @@ function user_preferences_update($method_name, $params, $app_data)
 #
 
 $request_xml = file_get_contents("php://input");
-file_put_contents('PDOErrors.txt', "$request_xml\n\n", FILE_APPEND);
 
 xmlrpc_server_call_method($xmlrpc_server, $request_xml, '');
 xmlrpc_server_destroy($xmlrpc_server);
