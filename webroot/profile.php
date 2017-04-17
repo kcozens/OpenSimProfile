@@ -733,4 +733,6 @@ file_put_contents('PDOErrors.txt', "$request_xml\n\n", FILE_APPEND);
 
 xmlrpc_server_call_method($xmlrpc_server, $request_xml, '');
 xmlrpc_server_destroy($xmlrpc_server);
+
+$db = NULL;
 ?>
