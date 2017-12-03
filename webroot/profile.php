@@ -60,7 +60,8 @@ function avatarclassifiedsrequest($method_name, $params, $app_data)
 
     $response_xml = xmlrpc_encode(array(
         'success' => True,
-        'data' => $data
+        'data' => $data,
+        'errorMessage' => $db->errorInfo()
     ));
 
     print $response_xml;
@@ -116,9 +117,9 @@ function classified_update($method_name, $params, $app_data)
     if ($description == "")
         $description = "No Description";
 
-    //If PG, Mature, and Adult flags are all 0 assume PG and set bit 2 .
-    //This works around what might be a viewer bug regarding the flags .
-    //The ossearch query.php file expects bit 2 set for any PG listing .
+    //If PG, Mature, and Adult flags are all 0 assume PG and set bit 2.
+    //This works around what might be a viewer bug regarding the flags.
+    //The ossearch query.php file expects bit 2 set for any PG listing.
     if (($classifiedflag & 76) == 0)
         $classifiedflag |= 4;
 
@@ -236,16 +237,20 @@ function avatarpicksrequest($method_name, $params, $app_data)
                             "creatoruuid = ?");
     $result = $query->execute( array($uuid) );
 
-    while ($row = $query->fetch(PDO::FETCH_ASSOC))
+    if ($result)
     {
-        $data[] = array(
-                "pickid" => $row["pickuuid"],
-                "name" => $row["name"]);
+        while ($row = $query->fetch(PDO::FETCH_ASSOC))
+        {
+            $data[] = array(
+                    "pickid" => $row["pickuuid"],
+                    "name" => $row["name"]);
+        }
     }
 
     $response_xml = xmlrpc_encode(array(
-        'success' => True,
-        'data' => $data
+        'success' => $result,
+        'data' => $data,
+        'errorMessage' => ""
     ));
 
     print $response_xml;
@@ -295,8 +300,9 @@ function pickinforequest($method_name, $params, $app_data)
     }
 
     $response_xml = xmlrpc_encode(array(
-        'success' => True,
-        'data' => $data
+        'success' => $result,
+        'data' => $data,
+        'errorMessage' => ""
     ));
 
     print $response_xml;
@@ -385,7 +391,8 @@ function picks_update($method_name, $params, $app_data)
         $result = False;
 
     $response_xml = xmlrpc_encode(array(
-        'success' => $result
+        'success' => $result,
+        'errorMessage' => $db->errorInfo()
     ));
 
     print $response_xml;
@@ -484,25 +491,26 @@ function avatar_notes_update($method_name, $params, $app_data)
     {
         // Create a new record for this avatar note
         $query = $db->prepare("INSERT INTO usernotes VALUES (?, ?, ?)");
-        $query->execute( array($uuid, $targetuuid, $notes) );
+        $result = $query->execute( array($uuid, $targetuuid, $notes) );
     }
     else if ($notes == "")
     {
         // Delete the record for this avatar note
         $query = $db->prepare("DELETE FROM usernotes WHERE " .
                                 "useruuid = ? AND targetuuid = ?");
-        $query->execute( array($uuid, $targetuuid) );
+        $result = $query->execute( array($uuid, $targetuuid) );
     }
     else
     {
         // Update the existing record
         $query = $db->prepare("UPDATE usernotes SET notes = ? WHERE " .
                                 "useruuid = ? AND targetuuid = ?");
-        $query->execute( array($notes, $uuid, $targetuuid) );
+        $result = $query->execute( array($notes, $uuid, $targetuuid) );
     }
 
     $response_xml = xmlrpc_encode(array(
-        'success' => True
+        'success' => $result,
+        'errorMessage' => ""
     ));
 
     print $response_xml;
@@ -568,8 +576,9 @@ function avatar_properties_request($method_name, $params, $app_data)
     }
 
     $response_xml = xmlrpc_encode(array(
-        'success' => True,
-        'data' => $data
+        'success' => $result,
+        'data' => $data,
+        'errorMessage' => $db->errorInfo()
     ));
 
     print $response_xml;
@@ -639,15 +648,16 @@ function avatar_interests_update($method_name, $params, $app_data)
                           "profileSkillsText = :skilltext, " .
                           "profileLanguages = :lang " .
                           "WHERE useruuid = :uuid");
-    $query->execute( array("wantmask"  => $wantmask,
-                           "wanttext"  => $wanttext,
-                           "skillmask" => $skillsmask,
-                           "skilltext" => $skillstext,
-                           "lang"      => $languages,
-                           "uuid"      => $uuid) );
+    $result = $query->execute( array("wantmask"  => $wantmask,
+                               "wanttext"  => $wanttext,
+                               "skillmask" => $skillsmask,
+                               "skilltext" => $skillstext,
+                               "lang"      => $languages,
+                               "uuid"      => $uuid) );
 
     $response_xml = xmlrpc_encode(array(
-        'success' => True
+        'success' => $result,
+        'errorMessage' => ""
     ));
 
     print $response_xml;
@@ -694,8 +704,9 @@ function user_preferences_request($method_name, $params, $app_data)
     }
 
     $response_xml = xmlrpc_encode(array(
-        'success' => True,
-        'data' => $data
+        'success' => $result,
+        'data' => $data,
+        'errorMessage' => $db->errorInfo()
     ));
 
     print $response_xml;
@@ -720,8 +731,9 @@ function user_preferences_update($method_name, $params, $app_data)
     $result = $query->execute( array($wantim, $directory, $uuid) );
 
     $response_xml = xmlrpc_encode(array(
-        'success' => True,
-        'data' => $data
+        'success' => $result,
+        'data' => $data,
+        'errorMessage' => ""
     ));
 
     print $response_xml;
@@ -732,6 +744,7 @@ function user_preferences_update($method_name, $params, $app_data)
 #
 
 $request_xml = file_get_contents("php://input");
+//file_put_contents('PDOErrors.txt', "$request_xml\n\n", FILE_APPEND);
 
 xmlrpc_server_call_method($xmlrpc_server, $request_xml, '');
 xmlrpc_server_destroy($xmlrpc_server);
