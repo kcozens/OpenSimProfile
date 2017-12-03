@@ -23,6 +23,18 @@ catch(PDOException $e)
 
 $zeroUUID = "00000000-0000-0000-0000-000000000000";
 
+function get_error_message($result)
+{
+    global $db;
+
+    if (!$result)
+        return "";
+
+    $errorInfo = $db->errorInfo();
+    return $errorInfo[2];
+}
+
+
 #
 # The XMLRPC server object
 #
@@ -60,8 +72,7 @@ function avatarclassifiedsrequest($method_name, $params, $app_data)
 
     $response_xml = xmlrpc_encode(array(
         'success' => True,
-        'data' => $data,
-        'errorMessage' => $db->errorInfo()
+        'data' => $data
     ));
 
     print $response_xml;
@@ -250,7 +261,7 @@ function avatarpicksrequest($method_name, $params, $app_data)
     $response_xml = xmlrpc_encode(array(
         'success' => $result,
         'data' => $data,
-        'errorMessage' => ""
+        'errorMessage' => get_error_message($result)
     ));
 
     print $response_xml;
@@ -302,7 +313,7 @@ function pickinforequest($method_name, $params, $app_data)
     $response_xml = xmlrpc_encode(array(
         'success' => $result,
         'data' => $data,
-        'errorMessage' => ""
+        'errorMessage' => get_error_message($result)
     ));
 
     print $response_xml;
@@ -392,7 +403,7 @@ function picks_update($method_name, $params, $app_data)
 
     $response_xml = xmlrpc_encode(array(
         'success' => $result,
-        'errorMessage' => $db->errorInfo()
+        'errorMessage' => get_error_message($result)
     ));
 
     print $response_xml;
@@ -416,7 +427,7 @@ function picks_delete($method_name, $params, $app_data)
 
     $response_xml = xmlrpc_encode(array(
         'success' => $result,
-        'errorMessage' => $db->errorInfo()
+        'errorMessage' => get_error_message($result)
     ));
 
     print $response_xml;
@@ -510,7 +521,7 @@ function avatar_notes_update($method_name, $params, $app_data)
 
     $response_xml = xmlrpc_encode(array(
         'success' => $result,
-        'errorMessage' => ""
+        'errorMessage' => get_error_message($result)
     ));
 
     print $response_xml;
@@ -578,7 +589,7 @@ function avatar_properties_request($method_name, $params, $app_data)
     $response_xml = xmlrpc_encode(array(
         'success' => $result,
         'data' => $data,
-        'errorMessage' => $db->errorInfo()
+        'errorMessage' => get_error_message($result)
     ));
 
     print $response_xml;
@@ -616,7 +627,7 @@ function avatar_properties_update($method_name, $params, $app_data)
 
     $response_xml = xmlrpc_encode(array(
         'success' => $result,
-        'errorMessage' => $db->errorInfo()
+        'errorMessage' => get_error_message($result)
     ));
 
     print $response_xml;
@@ -657,7 +668,7 @@ function avatar_interests_update($method_name, $params, $app_data)
 
     $response_xml = xmlrpc_encode(array(
         'success' => $result,
-        'errorMessage' => ""
+        'errorMessage' => get_error_message($result)
     ));
 
     print $response_xml;
@@ -706,7 +717,7 @@ function user_preferences_request($method_name, $params, $app_data)
     $response_xml = xmlrpc_encode(array(
         'success' => $result,
         'data' => $data,
-        'errorMessage' => $db->errorInfo()
+        'errorMessage' => get_error_message($result)
     ));
 
     print $response_xml;
@@ -733,7 +744,7 @@ function user_preferences_update($method_name, $params, $app_data)
     $response_xml = xmlrpc_encode(array(
         'success' => $result,
         'data' => $data,
-        'errorMessage' => ""
+        'errorMessage' => get_error_message($result)
     ));
 
     print $response_xml;
