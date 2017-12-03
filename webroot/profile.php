@@ -755,7 +755,6 @@ function user_preferences_update($method_name, $params, $app_data)
 #
 
 $request_xml = file_get_contents("php://input");
-//file_put_contents('PDOErrors.txt', "$request_xml\n\n", FILE_APPEND);
 
 xmlrpc_server_call_method($xmlrpc_server, $request_xml, '');
 xmlrpc_server_destroy($xmlrpc_server);
