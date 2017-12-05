@@ -107,10 +107,10 @@ function classified_update($method_name, $params, $app_data)
     // Check if we already have this one in the database
     $query = $db->prepare("SELECT COUNT(*) FROM classifieds WHERE " .
                             "classifieduuid = ?");
-    $result = $query->execute( array($classifieduuid) );
+    $query->execute( array($classifieduuid) );
 
-    $row = $query->fetch(PDO::FETCH_NUM);
-    if ($row[0] > 0)
+    //if ($query->rowCount() > 0)
+    if ($query->fetchColumn() > 0)
         $found = true;
     else
         $found = false;
@@ -248,14 +248,11 @@ function avatarpicksrequest($method_name, $params, $app_data)
                             "creatoruuid = ?");
     $result = $query->execute( array($uuid) );
 
-    if ($result)
+    while ($row = $query->fetch(PDO::FETCH_ASSOC))
     {
-        while ($row = $query->fetch(PDO::FETCH_ASSOC))
-        {
-            $data[] = array(
-                    "pickid" => $row["pickuuid"],
-                    "name" => $row["name"]);
-        }
+        $data[] = array(
+                "pickid" => $row["pickuuid"],
+                "name" => $row["name"]);
     }
 
     $response_xml = xmlrpc_encode(array(
@@ -287,10 +284,9 @@ function pickinforequest($method_name, $params, $app_data)
                             "creatoruuid = ? AND pickuuid = ?");
     $result = $query->execute( array($uuid, $pick) );
 
-    if ($result)
+    $row = $query->fetch(PDO::FETCH_ASSOC);
+    if ($row)
     {
-        $row = $query->fetch(PDO::FETCH_ASSOC);
-
         if ($row["description"] == null || $row["description"] == "")
             $row["description"] = "No description given";
 
@@ -396,11 +392,6 @@ function picks_update($method_name, $params, $app_data)
                                          "pick"     => $pickuuid) );
     }
 
-    if ($query->rowCount() == 1)
-        $result = True;
-    else
-        $result = False;
-
     $response_xml = xmlrpc_encode(array(
         'success' => $result,
         'errorMessage' => get_error_message($result)
@@ -454,9 +445,9 @@ function avatarnotesrequest($method_name, $params, $app_data)
 
     $query = $db->prepare("SELECT notes FROM usernotes WHERE " .
                             "useruuid = ? AND targetuuid = ?");
-    $result = $query->execute( array($uuid, $targetuuid) );
+    $query->execute( array($uuid, $targetuuid) );
 
-    if ($result == False)
+    if ($query->rowCount() == 0)
         $notes = "";
     else
     {
@@ -494,11 +485,11 @@ function avatar_notes_update($method_name, $params, $app_data)
 
     // Check if we already have this one in the database
 
-    $query = $db->prepare("SELECT COUNT(*) FROM usernotes WHERE " .
+    $query = $db->prepare("SELECT * FROM usernotes WHERE " .
                             "useruuid = ? AND targetuuid = ?");
     $query->execute( array($uuid, $targetuuid) );
 
-    if ($query->fetchColumn() == 0)
+    if ($query->rowCount() == 0)
     {
         // Create a new record for this avatar note
         $query = $db->prepare("INSERT INTO usernotes VALUES (?, ?, ?)");
@@ -541,11 +532,11 @@ function avatar_properties_request($method_name, $params, $app_data)
     $uuid           = $req['avatar_id'];
 
     $query = $db->prepare("SELECT * FROM userprofile WHERE useruuid = ?");
-    $result = $query->execute( array($uuid) );
+    $query->execute( array($uuid) );
 
-    if ($result)
+    $row = $query->fetch(PDO::FETCH_ASSOC);
+    if ($row)
     {
-        $row = $query->fetch(PDO::FETCH_ASSOC);
 
         $data[] = array(
                 "ProfileUrl" => $row["profileURL"],
@@ -691,10 +682,9 @@ function user_preferences_request($method_name, $params, $app_data)
                             "FROM usersettings WHERE useruuid = ?");
     $result = $query->execute( array($uuid) );
 
-    if ($result)
+    $row = $query->fetch(PDO::FETCH_ASSOC);
+    if ($row)
     {
-        $row = $query->fetch(PDO::FETCH_ASSOC);
-
         $data[] = array(
                 "imviaemail" => $row["imviaemail"],
                 "visible" => $row["visible"],
