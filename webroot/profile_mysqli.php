@@ -90,10 +90,10 @@ function classified_update($method_name, $params, $app_data)
     $check = mysqli_query($link,"SELECT COUNT(*) FROM classifieds WHERE ".
             "classifieduuid = '". mysqli_real_escape_string($link,$classifieduuid) ."'");
 
-    while ($row = mysqli_fetch_row($check))
-    {
-        $found = $row[0];
-    }
+    if ($row = mysqli_fetch_row($check))
+        $found = true;
+    else
+        $found = false;
 
     // Doing some late checking
     // Should be done by the module but let's see what happens when
@@ -420,11 +420,10 @@ function avatarnotesrequest($method_name, $params, $app_data)
             "useruuid = '". mysqli_real_escape_string($link,$uuid) ."' AND ".
             "targetuuid = '". mysqli_real_escape_string($link,$targetuuid) ."'");
 
-    $row = mysqli_fetch_row($result);
-    if ($row == False)
-        $notes = "";
-    else
+    if ($row = mysqli_fetch_row($result))
         $notes = $row[0];
+    else
+        $notes = "";
 
     $data[] = array(
             "targetid" => $targetuuid,
