@@ -1,33 +1,31 @@
 <?xml version="1.0" ?>
 <Project frameworkVersion="v4_6" name="OpenSimProfile.Modules" path="addon-modules/OpenSimProfile/Modules" type="Library">
-     <Configuration name="Debug">
-       <Options>
-         <OutputPath>../../../bin/</OutputPath>
-       </Options>
-     </Configuration>
-     <Configuration name="Release">
-       <Options>
-         <OutputPath>../../../bin/</OutputPath>
-       </Options>
-     </Configuration>
+    <Configuration name="Debug">
+      <Options>
+        <OutputPath>../../../bin/</OutputPath>
+      </Options>
+    </Configuration>
+    <Configuration name="Release">
+      <Options>
+        <OutputPath>../../../bin/</OutputPath>
+      </Options>
+    </Configuration>
 
-     <ReferencePath>../../../bin/</ReferencePath>
-     <Reference localCopy="false" name="System"/>
-     <Reference name="System.Xml"/>
-     <Reference name="OpenMetaverseTypes"/>
-     <Reference name="OpenMetaverse"/>
-     <Reference name="OpenSim.Framework"/>
-     <Reference name="OpenSim.Region.Framework"/>
-     <Reference name="OpenSim.Region.Framework.Interfaces"/>
-     <Reference name="OpenSim.Region.Framework.Scenes"/>
-     <Reference name="OpenSim.Services.Connectors"/>
-     <Reference name="OpenSim.Services.Interfaces"/>
-     <Reference name="Nini"/>
-     <Reference name="log4net"/>
-     <Reference name="XMLRPC"/>
-     <Reference name="Mono.Addins"/>
+    <ReferencePath>../../../bin/</ReferencePath>
+    <Reference localCopy="false" name="System"/>
+    <Reference name="System.Xml"/>
+    <Reference name="OpenMetaverseTypes"/>
+    <Reference name="OpenMetaverse"/>
+    <Reference name="OpenSim.Framework"/>
+    <Reference name="OpenSim.Region.Framework"/>
+    <Reference name="OpenSim.Services.Connectors"/>
+    <Reference name="OpenSim.Services.Interfaces"/>
+    <Reference name="Nini"/>
+    <Reference name="log4net"/>
+    <Reference name="XMLRPC"/>
+    <Reference name="Mono.Addins"/>
 
-     <Files>
-       <Match pattern="*.cs" recurse="true"/>
-     </Files>
+    <Files>
+      <Match pattern="*.cs" recurse="true"/>
+    </Files>
 </Project>
