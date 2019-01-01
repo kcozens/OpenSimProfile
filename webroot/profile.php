@@ -384,11 +384,13 @@ function picks_update($method_name, $params, $app_data)
                                 "name = :name,  " .
                                 "description = :desc,  " .
                                 "snapshotuuid = :snapshot " .
+                                "pos = :pos " .
                                 "WHERE pickuuid = :pick");
         $result = $query->execute( array("parcel"   => $parceluuid,
                                          "name"     => $name,
                                          "desc"     => $description,
                                          "snapshot" => $snapshotuuid,
+                                         "pos"      => $posglobal,
                                          "pick"     => $pickuuid) );
     }
 
