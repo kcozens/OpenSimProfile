@@ -355,6 +355,7 @@ function picks_update($method_name, $params, $app_data)
             "name = '". mysqli_real_escape_string($link,$name) . "', " .
             "description = '". mysqli_real_escape_string($link,$description) . "', " .
             "snapshotuuid = '". mysqli_real_escape_string($link,$snapshotuuid) . "' WHERE ".
+            "pos = '". mysqli_real_escape_string($link,$pos) ."'";
             "pickuuid = '". mysqli_real_escape_string($link,$pickuuid) ."'";
     }
 
