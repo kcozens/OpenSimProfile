@@ -41,7 +41,7 @@ function avatarclassifiedsrequest($method_name, $params, $app_data)
     $uuid           = $req['uuid'];
 
 
-    $result = mysqli_query($link,"SELECT * FROM classifieds WHERE ".
+    $result = mysqli_query($link,"SELECT `classifiedid`,`name` FROM classifieds WHERE ".
             "creatoruuid = '". mysqli_real_escape_string($link,$uuid) ."'");
 
     $data = array();
