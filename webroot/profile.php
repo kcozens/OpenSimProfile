@@ -4,14 +4,14 @@ include("databaseinfo.php");
 
 // Attempt to connect to the database
 try {
-  $db = new PDO("mysql:host=$DB_HOST;dbname=$DB_NAME", $DB_USER, $DB_PASSWORD);
-  $db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+    $db = new PDO("mysql:host=$DB_HOST;dbname=$DB_NAME", $DB_USER, $DB_PASSWORD);
+    $db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 }
 catch(PDOException $e)
 {
-  echo "Error connecting to database\n";
-  file_put_contents('PDOErrors.txt', $e->getMessage() . "\n-----\n", FILE_APPEND);
-  exit;
+    echo "Error connecting to database\n";
+    file_put_contents('PDOErrors.txt', $e->getMessage() . "\n-----\n", FILE_APPEND);
+    exit;
 }
 
 
@@ -58,7 +58,8 @@ function avatarclassifiedsrequest($method_name, $params, $app_data)
 
     $uuid           = $req['uuid'];
 
-    $query = $db->prepare("SELECT `classifieduuid`,`name` FROM classifieds WHERE creatoruuid = ?");
+    $query = $db->prepare("SELECT classifieduuid,name" .
+                          " FROM classifieds WHERE creatoruuid = ?");
     $result = $query->execute( array($uuid) );
 
     $data = array();
