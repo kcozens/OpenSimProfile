@@ -58,7 +58,7 @@ function avatarclassifiedsrequest($method_name, $params, $app_data)
 
     $uuid           = $req['uuid'];
 
-    $query = $db->prepare("SELECT `classifiedid`,`name` FROM classifieds WHERE creatoruuid = ?");
+    $query = $db->prepare("SELECT `classifieduuid`,`name` FROM classifieds WHERE creatoruuid = ?");
     $result = $query->execute( array($uuid) );
 
     $data = array();
