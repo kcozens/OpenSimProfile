@@ -539,6 +539,7 @@ function avatar_properties_request($method_name, $params, $app_data)
     $row = $query->fetch(PDO::FETCH_ASSOC);
     if ($row)
     {
+        $result = True;
 
         $data[] = array(
                 "ProfileUrl" => $row["profileURL"],
@@ -560,9 +561,9 @@ function avatar_properties_request($method_name, $params, $app_data)
         //FIXME: Should this only be done when asking for ones own profile?
         //Insert empty record for avatar .
         $query = $db->prepare("INSERT INTO userprofile VALUES ( " .
-                    ":uuid, '$zeroUUID', 0, 0, '', 0, '', 0, '', '', " .
+                    "?, '$zeroUUID', 0, 0, '', 0, '', 0, '', '', " .
                     "'$zeroUUID', '', '$zeroUUID', '')");
-        $result = $query->execute( array('uuid' => $uuid) );
+        $result = $query->execute( array("$uuid") );
 
         $data[] = array(
                 "ProfileUrl" => "",
