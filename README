@@ -93,7 +93,7 @@ Add the following lines to all OpenSim.ini files:
   ;// The ProfileURL is important. It must be correct or profiles won't work.//
   ;//                                                                        //
   ;// Change the URL to point to the profile.php file on your own web server //
-  ProfileURL = http://192.168.0.1/profile.php
+  ProfileURL = "http://192.168.0.1/profile.php"
   ;//                                                                        //
   ;////////////////////////////////////////////////////////////////////////////
 
