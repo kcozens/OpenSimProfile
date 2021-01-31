@@ -132,8 +132,10 @@ function classified_update($method_name, $params, $app_data)
     //If PG, Mature, and Adult flags are all 0 assume PG and set bit 2.
     //This works around what might be a viewer bug regarding the flags.
     //The ossearch query.php file expects bit 2 set for any PG listing.
-    if (($classifiedflag & 76) == 0)
-        $classifiedflag |= 4;
+    if ($classifiedflag & 2)    //Legacy mature bit set?
+        $classifiedflag |= 8;   //Set current mature bit
+    if (($classifiedflag & 0x4E) == 0)  //No bits set?
+        $classifiedflag |= 4;           //Set PG bit (1 << 2)
 
     //Renew Weekly flag is 32 (1 << 5)
     if (($classifiedflag & 32) == 0)
